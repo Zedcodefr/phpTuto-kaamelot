@@ -1,0 +1,42 @@
+// Devcontainer VS Code : « Reopen in Container », puis `make install` dans le terminal intégré.
+// Le conteneur ne contient que les outils (make, docker CLI) : PHP, Composer, Node et PostgreSQL
+// tournent dans les conteneurs de compose.yaml, exactement comme hors devcontainer.
+{
+  "name": "TaskBoard",
+  "build": { "dockerfile": "Dockerfile" },
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+
+  // Le dépôt est monté au même chemin que sur la machine : les volumes de compose.yaml
+  // (./apps/api-php:/app...) sont résolus par le Docker de la machine, ce chemin doit donc exister chez lui.
+  "workspaceMount": "source=${localWorkspaceFolder},target=${localWorkspaceFolder},type=bind",
+  "workspaceFolder": "${localWorkspaceFolder}",
+
+  "runArgs": ["--add-host=host.docker.internal:host-gateway"],
+  // Xdebug : les conteneurs PHP appellent host.docker.internal:9003, qu'on publie vers l'extension PHP Debug d'ici
+  "appPort": [9003],
+  "postStartCommand": "bash .devcontainer/forward-ports.sh",
+
+  // Les URL des cours (http://localhost:5173, :8081, :8082...) s'ouvrent directement sur la machine :
+  // les ports sont déjà publiés par Docker, VS Code n'a rien à transférer.
+  "otherPortsAttributes": { "onAutoForward": "ignore" },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "bmewburn.vscode-intelephense-client",
+        "xdebug.php-debug",
+        "oxc.oxc-vscode",
+        "EditorConfig.EditorConfig",
+        "mikestead.dotenv"
+      ],
+      "settings": {
+        "intelephense.environment.phpVersion": "8.4.0",
+        "php.validate.enable": false,
+        "php.suggest.basic": false,
+        "typescript.tsdk": "apps/front/node_modules/typescript/lib"
+      }
+    }
+  }
+}

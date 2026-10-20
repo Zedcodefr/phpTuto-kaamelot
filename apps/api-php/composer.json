@@ -1,0 +1,16 @@
+{
+    "name": "taskboard/api-php",
+    "description": "TaskBoard - API en PHP pur (partie 1 de la formation)",
+    "type": "project",
+    "license": "proprietary",
+    "require": {
+        "php": ">=8.4",
+        "ext-pdo": "*",
+        "ext-json": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

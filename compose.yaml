@@ -1,0 +1,100 @@
+name: taskboard
+
+# Toutes les commandes passent par le Makefile : `make help`
+services:
+
+  # ---------------------------------------------------------------- Base de données
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+      POSTGRES_DB: taskboard
+    ports:
+      - "5433:5432"          # 5433 côté hôte pour ne pas entrer en conflit avec un Postgres local
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./docker/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d taskboard"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  adminer:                   # Interface web pour consulter la base (≈ SSMS très léger)
+    image: adminer:4
+    ports:
+      - "8090:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: db
+    depends_on: [db]
+
+  # ---------------------------------------------------------------- Partie 1 : API en PHP pur
+  api-php:
+    build: ./docker/php
+    image: taskboard-php:dev
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    working_dir: /app
+    # Serveur web intégré à PHP : parfait pour apprendre, jamais en production.
+    command: php -S 0.0.0.0:8000 -t public
+    ports:
+      - "8081:8000"
+    environment:
+      DB_DSN: "pgsql:host=db;port=5432;dbname=taskboard_php"
+      DB_USER: app
+      DB_PASSWORD: app
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      PHP_IDE_CONFIG: serverName=taskboard-php     # nom du "serveur" à déclarer dans PhpStorm
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./apps/api-php:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------- Partie 2 : API Symfony
+  api-symfony:              # PHP-FPM : exécute le code PHP
+    build: ./docker/php
+    image: taskboard-php:dev
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    working_dir: /app
+    environment:
+      XDEBUG_MODE: ${XDEBUG_MODE:-off}
+      PHP_IDE_CONFIG: serverName=taskboard-symfony
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./apps/api-symfony:/app
+    depends_on:
+      db:
+        condition: service_healthy
+
+  nginx-symfony:            # Serveur HTTP devant PHP-FPM
+    image: nginx:1.27-alpine
+    ports:
+      - "8082:80"
+    volumes:
+      - ./apps/api-symfony/public:/app/public:ro
+      - ./docker/nginx/symfony.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on: [api-symfony]
+
+  # ---------------------------------------------------------------- Front React
+  front:
+    image: node:24-alpine
+    user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+    working_dir: /app
+    command: sh -c "npm run dev -- --host 0.0.0.0 --port 5173"
+    ports:
+      - "5173:5173"
+    environment:
+      HOME: /tmp
+      NPM_CONFIG_UPDATE_NOTIFIER: "false"
+      # Backend vers lequel Vite redirige les appels /api (voir apps/front/vite.config.ts)
+      # Changer avec `make use-php` / `make use-symfony`
+      API_TARGET: ${API_TARGET:-http://api-php:8000}
+    volumes:
+      - ./apps/front:/app
+
+volumes:
+  db-data:

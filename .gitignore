@@ -1,0 +1,21 @@
+# Dépendances (réinstallées par `make install`)
+/apps/api-php/vendor/
+/apps/api-symfony/vendor/
+/apps/front/node_modules/
+/formateur/solutions/*/vendor/
+
+# Choix local de l'API appelée par le front (make use-php / make use-symfony)
+/.env
+
+# Générés
+/apps/api-symfony/var/
+/apps/api-symfony/.env.local
+/apps/api-symfony/.env.*.local
+/apps/api-symfony/.phpunit.cache/
+/apps/front/dist/
+
+# IDE / OS
+.idea/
+.vscode/*
+!.vscode/launch.json
+.DS_Store

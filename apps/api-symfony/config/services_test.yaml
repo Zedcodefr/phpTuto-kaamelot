@@ -1,0 +1,7 @@
+# Services spécifiques à l'environnement de test.
+# Les services Symfony sont PRIVÉS par défaut, et ceux que personne n'injecte sont supprimés à la compilation.
+# Le kata Doctrine récupère Library directement dans le conteneur : on le rend public en test uniquement.
+services:
+    App\Kata\Library:
+        autowire: true
+        public: true

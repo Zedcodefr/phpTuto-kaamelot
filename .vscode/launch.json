@@ -1,0 +1,21 @@
+{
+  // Debug pas-à-pas PHP avec l'extension "PHP Debug" (xdebug.php-debug).
+  // 1. XDEBUG_MODE=debug make up   2. F5 sur la config voulue   3. appeler l'API
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Xdebug - API PHP pur",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "pathMappings": { "/app": "${workspaceFolder}/apps/api-php" }
+    },
+    {
+      "name": "Xdebug - API Symfony",
+      "type": "php",
+      "request": "launch",
+      "port": 9003,
+      "pathMappings": { "/app": "${workspaceFolder}/apps/api-symfony" }
+    }
+  ]
+}
