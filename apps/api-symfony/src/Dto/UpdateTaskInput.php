@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Dto;
 
 use App\Enum\TaskStatus;
+use App\Validator\ExistingProject;
+use App\Validator\ExistingUser;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -25,6 +27,14 @@ final readonly class UpdateTaskInput
         public ?string $description = null,
 
         public ?TaskStatus $status = null,
+
+        // B1-3 : id du projet de rattachement (null = aucun projet). Inexistant → 422 sur projectId.
+        #[ExistingProject]
+        public ?int $projectId = null,
+
+        // B2-4a : id de l'utilisateur assigné ; "assigneeId": null (présent dans le JSON) → désassigner.
+        #[ExistingUser]
+        public ?int $assigneeId = null,
     ) {
     }
 }

@@ -7,7 +7,7 @@ namespace App\Repository;
 use App\Entity\Task;
 
 /**
- * FOURNI. Contrat entre le Lot B (qui l'implémente avec PDO) et le Lot C (qui l'utilise dans le contrôleur).
+ * Contrat entre le Lot B (qui l'implémente avec PDO) et le Lot C (qui l'utilise dans le contrôleur).
  * ≈ une interface ITaskRepository injectée en C#.
  */
 interface TaskRepositoryInterface

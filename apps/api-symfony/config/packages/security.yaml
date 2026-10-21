@@ -1,0 +1,44 @@
+security:
+    # https://symfony.com/doc/7.4/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+
+    # Charge un User par son email (utilisé par loginUser() dans les tests, et par Security en général)
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+
+    firewalls:
+        dev:
+            # Ensure dev tools and static assets are always allowed
+            pattern: ^/(_profiler|_wdt|assets|build)/
+            security: false
+        api:
+            pattern: ^/api
+            stateless: true          # pas de session ni de cookie : chaque requête porte son token
+            provider: app_user_provider
+            access_token:            # lit "Authorization: Bearer <token>"
+                token_handler: App\Security\ApiTokenHandler
+                failure_handler: App\Security\ApiTokenFailureHandler
+
+    # Note: Only the *first* matching rule is applied
+    access_control:
+        - { path: ^/api/auth, roles: PUBLIC_ACCESS }
+        # B2-4b : toutes les écritures exigent un token valide (sinon 401) ; les GET restent publics.
+        - { path: ^/api, methods: [POST, PATCH, PUT, DELETE], roles: IS_AUTHENTICATED }
+
+when@test:
+    security:
+        password_hashers:
+            # Password hashers are resource-intensive by design to ensure security.
+            # In tests, it's safe to reduce their cost to improve performance.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon

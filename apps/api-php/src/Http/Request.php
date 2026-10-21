@@ -5,20 +5,13 @@ declare(strict_types=1);
 namespace App\Http;
 
 /**
- * Requête HTTP entrante, immuable. ≈ HttpRequest d'ASP.NET Core (en très simplifié).
- *
- * Propriétaires :
- *   - fromGlobals() : 🅰️ Lot A (HTTP & routage)
- *   - json()        : 🅲 Lot C (métier & validation)
- * Le constructeur est FOURNI et ne doit pas changer : c'est le contrat entre les lots.
+ * Encapsule les superglobales ($_SERVER, $_GET...) dans un objet immuable.
+ * ≈ HttpRequest d'ASP.NET Core (en beaucoup plus simple).
  */
 final readonly class Request
 {
     /**
-     * @param string                $method HTTP en majuscules : GET, POST, PATCH, DELETE
-     * @param string                $path   chemin sans query string ni "/" final : "/api/tasks/3"
-     * @param array<string, string> $query  paramètres de la query string (?status=todo)
-     * @param string                $body   corps brut de la requête (le JSON envoyé)
+     * @param array<string, string> $query
      */
     public function __construct(
         public string $method,
@@ -28,32 +21,39 @@ final readonly class Request
     ) {
     }
 
-    /**
-     * 🅰️ LOT A — Construit la Request à partir des superglobales PHP.
-     *
-     * - méthode : $_SERVER['REQUEST_METHOD'] (en majuscules)
-     * - chemin  : $_SERVER['REQUEST_URI'] sans la query string, sans "/" final ("/" reste "/")
-     * - query   : $_GET
-     * - corps   : à lire dans le flux php://input
-     */
     public static function fromGlobals(): self
     {
-        throw new \LogicException('TODO Lot A : Request::fromGlobals()');
+        return new self(
+            method: strtoupper($_SERVER['REQUEST_METHOD'] ?? 'GET'),
+            path: rtrim(parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/', '/') ?: '/',
+            query: $_GET,
+            // Le corps brut de la requête (le JSON) se lit dans le flux php://input
+            body: (string) file_get_contents('php://input'),
+        );
     }
 
     /**
-     * 🅲 LOT C — Décode le corps JSON en tableau associatif.
-     *
-     * - JSON invalide (ou corps vide)               → HttpException 400
-     * - JSON valide mais pas un objet (ex. [1,2], [], 3) → HttpException 400
-     * - "{}"                                          → []
+     * Décode le corps JSON en tableau associatif.
      *
      * @return array<string, mixed>
      *
-     * @throws HttpException
+     * @throws HttpException 400 si le JSON est invalide ou n'est pas un objet
      */
     public function json(): array
     {
-        throw new \LogicException('TODO Lot C : Request::json()');
+        try {
+            // Sans `true` : un objet JSON devient un \stdClass, une liste JSON un array.
+            // C'est le seul moyen de distinguer {} de [] (tous deux décodés en [] avec `true`).
+            $decoded = json_decode($this->body, flags: JSON_THROW_ON_ERROR);
+        } catch (\JsonException $e) {
+            throw new HttpException(400, 'Invalid JSON: ' . $e->getMessage());
+        }
+
+        if (!$decoded instanceof \stdClass) {
+            throw new HttpException(400, 'JSON body must be an object');
+        }
+
+        // On sait maintenant que c'est un objet : on redécode en tableaux associatifs (à tous les niveaux).
+        return json_decode($this->body, true, flags: JSON_THROW_ON_ERROR);
     }
 }

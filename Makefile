@@ -164,8 +164,8 @@ dql: ## Exécute une requête DQL (make dql q="SELECT a.name FROM App\Kata\Entit
 sql: ## Exécute une requête SQL sur la base Symfony (make sql q="SELECT * FROM task")
 	$(CONSOLE) dbal:run-sql "$(q)"
 
-sf-check: ## Vérifie que l'API Symfony respecte le contrat (même script que la partie 1)
-	$(DC) exec api-php php tools/contract-check.php http://nginx-symfony
+sf-check: ## Vérifie que l'API Symfony respecte le contrat (même script que la partie 1, connecté en tant qu'alice)
+	$(DC) exec -e API_LOGIN=alice@taskboard.local:password api-php php tools/contract-check.php http://nginx-symfony
 
 sf-psql: ## Console SQL sur la base Symfony
 	$(DC) exec db psql -U app -d taskboard

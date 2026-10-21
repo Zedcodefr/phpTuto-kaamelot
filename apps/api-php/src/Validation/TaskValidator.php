@@ -4,29 +4,48 @@ declare(strict_types=1);
 
 namespace App\Validation;
 
+use App\Enum\TaskStatus;
 use App\Http\ValidationException;
 
 /**
- * 🅲 LOT C — Validation des données reçues en JSON (règles : docs/api-contract.md).
- *
- * Messages à utiliser (identiques à Symfony, pour que le front se comporte pareil avec les deux API) :
- *   title vide / absent / pas une string  : "This value should not be blank."
- *   title < 3 ou > 255 caractères         : "This value should have between 3 and 255 characters."
- *   description pas une string           : "This value should be of type string."
- *   description > 2000 caractères         : "This value is too long. It should have 2000 characters or less."
- *   status inconnu                        : "The value should be one of: todo, in_progress, done."
- * Attention : longueur en CARACTÈRES, pas en octets (UTF-8).
+ * Valide les données reçues en JSON. Messages identiques à ceux de Symfony
+ * pour que le front se comporte pareil avec les deux API.
  */
 final class TaskValidator
 {
     /**
-     * @param array<string, mixed> $data    le JSON décodé
-     * @param bool                 $partial true pour un PATCH : seuls les champs présents sont validés
+     * @param array<string, mixed> $data
+     * @param bool $partial true pour un PATCH : seuls les champs présents sont validés
      *
-     * @throws ValidationException avec TOUTES les erreurs trouvées (pas seulement la première)
+     * @throws ValidationException
      */
     public function validate(array $data, bool $partial = false): void
     {
-        throw new \LogicException('TODO Lot C : TaskValidator::validate()');
+        $errors = [];
+
+        if (!$partial || array_key_exists('title', $data)) {
+            $title = $data['title'] ?? null;
+            if (!is_string($title) || trim($title) === '') {
+                $errors['title'] = 'This value should not be blank.';
+            } elseif (mb_strlen($title) < 3 || mb_strlen($title) > 255) {
+                $errors['title'] = 'This value should have between 3 and 255 characters.';
+            }
+        }
+
+        if (isset($data['description'])) {
+            if (!is_string($data['description'])) {
+                $errors['description'] = 'This value should be of type string.';
+            } elseif (mb_strlen($data['description']) > 2000) {
+                $errors['description'] = 'This value is too long. It should have 2000 characters or less.';
+            }
+        }
+
+        if (array_key_exists('status', $data) && TaskStatus::tryFrom((string) $data['status']) === null) {
+            $errors['status'] = 'The value should be one of: ' . implode(', ', TaskStatus::values()) . '.';
+        }
+
+        if ($errors !== []) {
+            throw new ValidationException($errors);
+        }
     }
 }

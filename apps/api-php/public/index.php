@@ -1,41 +1,51 @@
 <?php
 
 /**
- * Front controller : TOUTES les requêtes HTTP arrivent dans ce fichier
- * (le serveur web est configuré pour ça). C'est votre "Program.cs".
+ * Front controller : TOUTES les requêtes HTTP arrivent ici.
  *
- * ⚠️ Différence majeure avec .NET : ce script est exécuté de zéro à CHAQUE requête,
- * puis tout est détruit (modèle "share nothing"). Rien ne reste en mémoire entre deux requêtes.
- *
- * Point de départ de la partie 1 : voir docs/01-php/04-exercices-api-php-pur.md
- * Les classes de src/ sont des squelettes répartis en 3 lots (🅰️ 🅱️ 🅲) : make php-check-a / -b / -c
+ * Rappel du modèle d'exécution PHP ("share nothing") : ce script est exécuté
+ * de zéro à CHAQUE requête, puis tout est détruit. Pas d'état en mémoire
+ * entre deux requêtes, pas de singleton qui survit, pas de Program.cs qui tourne en continu.
  */
 
-declare(strict_types=1); // Active le typage strict pour ce fichier (à mettre partout !)
+declare(strict_types=1);
 
-// Autoloader généré par Composer : charge automatiquement les classes de src/ (namespace App\)
+use App\Controller\TaskController;
+use App\Database\Connection;
+use App\Http\HttpException;
+use App\Http\JsonResponse;
+use App\Http\Request;
+use App\Http\Router;
+use App\Repository\TaskRepository;
+
 require dirname(__DIR__) . '/vendor/autoload.php';
 
-// Les "superglobales" $_SERVER, $_GET, $_POST... contiennent la requête HTTP courante
-$method = $_SERVER['REQUEST_METHOD'];
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-// Les en-têtes doivent être envoyés AVANT le moindre echo
-header('Content-Type: application/json; charset=utf-8');
-
-if ($method === 'GET' && $path === '/api/health') {
-    echo json_encode(['status' => 'ok']);
-
-    return;
+// Le serveur intégré "php -S" sert directement les fichiers statiques s'ils existent.
+if (PHP_SAPI === 'cli-server' && is_file(__DIR__ . parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH))) {
+    return false;
 }
 
-// TODO Exercice 2 (en mob) : GET /api/tasks avec un tableau en dur
-// TODO Intégration (Lot A) : remplacer cette suite de "if" par les classes de src/
-//      (Router, TaskController, TaskRepository...) une fois les 3 lots terminés
+$request = Request::fromGlobals();
 
-http_response_code(404);
-echo json_encode([
-    'title' => 'Not Found',
-    'status' => 404,
-    'detail' => "No route for $method $path",
-]);
+try {
+    // "Conteneur d'injection de dépendances" fait main : on câble les objets nous-mêmes.
+    $pdo = Connection::fromEnvironment();
+    $taskController = new TaskController(new TaskRepository($pdo));
+
+    $router = new Router();
+    $router->get('/api/health', fn (): JsonResponse => new JsonResponse(['status' => 'ok']));
+    $router->get('/api/tasks', $taskController->list(...));          // "first-class callable" (PHP 8.1)
+    $router->get('/api/tasks/{id}', $taskController->show(...));
+    $router->post('/api/tasks', $taskController->create(...));
+    $router->patch('/api/tasks/{id}', $taskController->update(...));
+    $router->delete('/api/tasks/{id}', $taskController->delete(...));
+
+    $response = $router->dispatch($request);
+} catch (HttpException $e) {
+    $response = $e->toResponse();
+} catch (\Throwable $e) {
+    error_log((string) $e); // visible dans `make logs s=api-php`
+    $response = new JsonResponse(['title' => 'Internal Server Error', 'status' => 500, 'detail' => $e->getMessage()], 500);
+}
+
+$response->send();

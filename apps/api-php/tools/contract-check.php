@@ -6,6 +6,10 @@
  *   make php-check   (API PHP pur)
  *   make sf-check    (API Symfony)
  *
+ * Authentification (partie 2B) : si la variable d'environnement API_TOKEN est définie, chaque requête envoie
+ * "Authorization: Bearer <API_TOKEN>". Sinon, si API_LOGIN="email:motdepasse" est définie, le script commence
+ * par POST /api/auth/login pour obtenir un token. Sans ces variables (API PHP pur), rien ne change.
+ *
  * Écrit en PHP pur, sans dépendance : n'hésitez pas à le lire, c'est aussi un exemple de code !
  */
 
@@ -13,6 +17,7 @@ declare(strict_types=1);
 
 $baseUrl = rtrim($argv[1] ?? 'http://localhost:8000', '/');
 $failures = 0;
+$token = getenv('API_TOKEN') ?: null;
 
 // Le script tourne DANS le conteneur api-php : $baseUrl est une adresse du réseau Docker.
 // Depuis votre poste (navigateur, curl), la même API se joint via le port publié dans compose.yaml.
@@ -30,9 +35,11 @@ $target = $hostUrl === null ? $baseUrl : "$hostUrl \033[2m(depuis le conteneur :
  */
 function call(string $method, string $url, ?array $body = null): array
 {
+    global $token;
     $context = stream_context_create(['http' => [
         'method' => $method,
-        'header' => "Content-Type: application/json\r\nAccept: application/json\r\n",
+        'header' => "Content-Type: application/json\r\nAccept: application/json\r\n"
+            . ($token !== null ? "Authorization: Bearer $token\r\n" : ''),
         'content' => $body === null ? '' : json_encode($body),
         'ignore_errors' => true, // ne pas lever d'erreur sur 4xx/5xx : on veut lire la réponse
         'timeout' => 5,
@@ -86,6 +93,18 @@ function isTask(mixed $t): bool
 }
 
 echo "\nContrat d'API — partie 1 — $target\n\n";
+
+$login = getenv('API_LOGIN') ?: null;
+if ($token === null && $login !== null) {
+    [$email, $password] = explode(':', $login, 2) + [1 => ''];
+    [$code, $body] = call('POST', "$baseUrl/api/auth/login", ['email' => $email, 'password' => $password]);
+    if ($code !== 200 || !is_string($body['token'] ?? null)) {
+        fwrite(STDERR, "\033[31mConnexion impossible avec API_LOGIN ($email) : HTTP $code. Fixtures chargées ? (make sf-db-reset)\033[0m\n");
+        exit(2);
+    }
+    $token = $body['token'];
+    echo "\033[2m(authentifié en tant que $email)\033[0m\n\n";
+}
 
 echo "GET /api/health\n";
 [$code, $body] = call('GET', "$baseUrl/api/health");

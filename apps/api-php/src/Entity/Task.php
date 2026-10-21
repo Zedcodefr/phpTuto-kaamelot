@@ -7,9 +7,8 @@ namespace App\Entity;
 use App\Enum\TaskStatus;
 
 /**
- * Une tâche. Propriétaire : 🅱️ Lot B. Le constructeur est FOURNI (contrat entre les lots).
- *
- * JsonSerializable : json_encode($task) appellera automatiquement jsonSerialize().
+ * JsonSerializable : json_encode() appellera jsonSerialize() automatiquement.
+ * C'est ici qu'on décide de la forme JSON (camelCase, format des dates...).
  */
 final class Task implements \JsonSerializable
 {
@@ -23,24 +22,29 @@ final class Task implements \JsonSerializable
     }
 
     /**
-     * 🅱️ LOT B — Construit une Task à partir d'une ligne SQL (tableau associatif renvoyé par PDO).
-     * Colonnes : id, title, description, status, created_at.
+     * Construit une Task à partir d'une ligne SQL (tableau associatif renvoyé par PDO).
      *
-     * @param array<string, mixed> $row
+     * @param array{id: int, title: string, description: ?string, status: string, created_at: string} $row
      */
     public static function fromRow(array $row): self
     {
-        throw new \LogicException('TODO Lot B : Task::fromRow()');
+        return new self(
+            title: $row['title'],
+            description: $row['description'],
+            status: TaskStatus::from($row['status']),
+            createdAt: new \DateTimeImmutable($row['created_at']),
+            id: (int) $row['id'],
+        );
     }
 
-    /**
-     * 🅱️ LOT B — Forme JSON définie par le contrat d'API :
-     * id, title, description, status (valeur string), createdAt (format DATE_ATOM, ex. 2026-10-15T09:30:00+02:00)
-     *
-     * @return array<string, mixed>
-     */
     public function jsonSerialize(): array
     {
-        throw new \LogicException('TODO Lot B : Task::jsonSerialize()');
+        return [
+            'id' => $this->id,
+            'title' => $this->title,
+            'description' => $this->description,
+            'status' => $this->status->value,
+            'createdAt' => $this->createdAt?->format(DATE_ATOM),
+        ];
     }
 }

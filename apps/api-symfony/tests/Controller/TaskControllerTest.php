@@ -6,6 +6,7 @@ namespace App\Tests\Controller;
 
 use App\Entity\Task;
 use App\Enum\TaskStatus;
+use App\Tests\Security\LogsInUsers;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -19,6 +20,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 final class TaskControllerTest extends WebTestCase
 {
+    use LogsInUsers;
+
     private KernelBrowser $client;
     private EntityManagerInterface $em;
 
@@ -26,6 +29,9 @@ final class TaskControllerTest extends WebTestCase
     {
         $this->client = static::createClient();
         $this->em = static::getContainer()->get(EntityManagerInterface::class);
+        // B2-4b / B2-5 : les écritures exigent un utilisateur connecté, et supprimer une tâche sans auteur est
+        // réservé aux admins (TaskVoter) : on se connecte en admin pour tester le CRUD de la partie 1.
+        $this->logIn($this->client, 'admin@taskboard.local', ['ROLE_ADMIN']);
     }
 
     public function testListReturnsTasksOrderedById(): void
@@ -86,6 +92,22 @@ final class TaskControllerTest extends WebTestCase
 
         $this->client->request('GET', "/api/tasks/$id");
         self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testWritesWithoutTokenReturn401(): void
+    {
+        $id = $this->createTask('Protégée');
+        $this->logOut($this->client);
+
+        $this->client->jsonRequest('POST', '/api/tasks', ['title' => 'Sans token']);
+        self::assertResponseStatusCodeSame(401);
+        $this->client->jsonRequest('PATCH', "/api/tasks/$id", ['status' => 'done']);
+        self::assertResponseStatusCodeSame(401);
+        $this->client->request('DELETE', "/api/tasks/$id");
+        self::assertResponseStatusCodeSame(401);
+
+        $this->client->request('GET', "/api/tasks/$id");
+        self::assertResponseIsSuccessful('Les GET restent publics.');
     }
 
     private function createTask(string $title, ?string $description = null): int
