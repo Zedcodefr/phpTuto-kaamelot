@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Atelier;
 
+use App\Tests\Security\LogsInUsers;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -13,11 +14,15 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
  */
 abstract class AtelierTestCase extends WebTestCase
 {
+    use LogsInUsers;
+
     protected KernelBrowser $client;
 
     protected function setUp(): void
     {
         $this->client = static::createClient();
+        // Branche formateur : depuis B2-4b, les écritures sous /api exigent un token (sinon 401)
+        $this->logIn($this->client);
     }
 
     /** Crée une tâche par l'API et renvoie son id. */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Dto;
 
 use App\Enum\TaskStatus;
+use App\Validator\NotShouting;
 use App\Validator\ExistingProject;
 use App\Validator\ExistingUser;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -21,6 +22,7 @@ final readonly class UpdateTaskInput
     public function __construct(
         #[Assert\NotBlank(allowNull: true)]
         #[Assert\Length(min: 3, max: 255)]
+        #[NotShouting] // atelier A2
         public ?string $title = null,
 
         #[Assert\Length(max: 2000)]

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Enum\TaskStatus;
+use App\Exception\TaskAlreadyDone;
 use App\Repository\TaskRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -106,6 +107,15 @@ class Task
     public function changeStatus(TaskStatus $status): void
     {
         $this->status = $status;
+    }
+
+    /** Atelier A4 — impossible de terminer deux fois, d'où qu'on l'appelle. */
+    public function complete(): void
+    {
+        if (TaskStatus::Done === $this->status) {
+            throw new TaskAlreadyDone($this->id);
+        }
+        $this->status = TaskStatus::Done;
     }
 
     #[Groups(['task:read'])]

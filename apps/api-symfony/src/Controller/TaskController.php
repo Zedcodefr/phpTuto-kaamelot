@@ -12,6 +12,7 @@ use App\Entity\Task;
 use App\Entity\User;
 use App\Repository\ProjectRepository;
 use App\Repository\TaskRepository;
+use App\Service\TaskStats;
 use App\Repository\UserRepository;
 use App\Security\TaskVoter;
 use Doctrine\ORM\EntityManagerInterface;
@@ -59,6 +60,13 @@ final class TaskController extends AbstractController
 
     // Task $task : l'entité est chargée automatiquement depuis {id} (EntityValueResolver).
     // Introuvable => 404 automatique.
+    // Atelier A1 — '/stats' n'est pas pris pour '/{id}' grâce à requirements: ['id' => '\d+']
+    #[Route('/stats', name: 'stats', methods: ['GET'])]
+    public function stats(TaskStats $stats): JsonResponse
+    {
+        return $this->json($stats->compute());
+    }
+
     #[Route('/{id}', name: 'show', requirements: ['id' => '\d+'], methods: ['GET'])]
     public function show(Task $task): JsonResponse
     {
@@ -107,6 +115,16 @@ final class TaskController extends AbstractController
 
         // Pas de persist() : l'entité est déjà suivie par l'EntityManager (Unit of Work),
         // flush() détecte les changements tout seul (≈ change tracking d'EF Core).
+        $this->em->flush();
+
+        return $this->json($task, context: self::CONTEXT);
+    }
+
+    // Atelier A4 — la règle est dans Task::complete() ; TaskAlreadyDone → 409 grâce à #[WithHttpStatus]
+    #[Route('/{id}/complete', name: 'complete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function complete(Task $task): JsonResponse
+    {
+        $task->complete();
         $this->em->flush();
 
         return $this->json($task, context: self::CONTEXT);
