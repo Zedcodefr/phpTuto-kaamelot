@@ -39,6 +39,7 @@ si vous avancez vite, passez aux bonus ou à l'étape suivante.
 | | [Exercices](01-php/04-exercices-api-php-pur.md) : exercices 1-2 **en mob**, lecture des squelettes, lots 🅰️ 🅱️ 🅲 en parallèle (`make php-check-a` / `-b` / `-c`), intégration (`make php-check` vert, front branché avec `make use-php`) | F1 → F4 sur l'API Symfony (`make use-symfony`), puis `make use-php` pour la démo commune |
 | | **Revues orales des lots** + débrief | Démo commune |
 | **2 — Symfony** | [Symfony](02-symfony/README.md) : principes, particularités, [visite du projet](02-symfony/03-visite-du-projet.md) + quiz | F5 — routing + page détail |
+| | [Atelier pratique](02-symfony/05-atelier-pratique.md) : 5 exercices avec tests (`make sf-atelier`), seul ou en binôme sur `atelier/<prénom>` (jamais mergée), puis débrief | (suite F5) |
 | **3 — Doctrine & DQL** | [Doctrine](03-doctrine/README.md) : ORM et mapping, relations, DQL et QueryBuilder + quiz | F6 — formulaire de création (422) |
 | | [Kata Doctrine](03-doctrine/04-kata-doctrine.md) : K01 → K16 + K20 obligatoires, le reste en bonus ; débrief K06 / K12 / K20 | F7 — statut et suppression · relecture d'une PR back |
 | **4 — Projet** | [Backlog](02-symfony/04-backlog-back.md) : chacun pose ses entités et migrations (ordre de passage sur `Task`), puis livre son **socle obligatoire**, puis des bonus. B1 projets · B2 authentification · B3 filtres/pagination + commentaires | F8 projets · F9 authentification · F10 commentaires (mocks conformes au contrat en attendant les livraisons back) ; F11 en bonus |

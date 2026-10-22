@@ -64,7 +64,7 @@ Prérequis : `make install` fait sur chaque poste **avant de commencer** ([check
 |---|---|---|
 | **1 — PHP** | Lancement ([contrat d'API](docs/api-contract.md), [charte IA](docs/00-charte-ia.md)) · [cours PHP](docs/01-php/README.md) condensé · [API Tâches en PHP pur](docs/01-php/04-exercices-api-php-pur.md) dans `apps/api-php`, en **3 lots parallèles** (🅰️ HTTP & routage · 🅱️ Données & PDO · 🅲 Métier & validation) · intégration · revues orales | [Cours React](docs/04-react/README.md) + [F1 à F4](docs/04-react/03-exercices-front.md) |
 | ⭐ fin de l'étape 1 | `make php-check-a/-b/-c` puis `make php-check` verts, tâches affichées dans le front (`make use-php`) | |
-| **2 — Symfony** | [Cours Symfony](docs/02-symfony/README.md) (principes, différences avec ASP.NET Core, visite du projet) | F5 → F7 |
+| **2 — Symfony** | [Cours Symfony](docs/02-symfony/README.md) (principes, différences avec ASP.NET Core, visite du projet) · [atelier pratique](docs/02-symfony/05-atelier-pratique.md) (`make sf-atelier`) | F5 → F7 |
 | **3 — Doctrine & DQL** | [Cours Doctrine](docs/03-doctrine/README.md) (ORM, relations, DQL) · [kata](docs/03-doctrine/04-kata-doctrine.md) (`make sf-kata`) | (suite F5 → F7) |
 | **4 — Projet** | [Backlog back](docs/02-symfony/04-backlog-back.md) dans `apps/api-symfony` : socle par dev (projets · auth · filtres & commentaires), puis bonus · démo, oraux, rétro | F8 → F10 (F11 bonus) |
 
@@ -80,6 +80,7 @@ donnent lieu à une **revue orale** courte avec le formateur, sur son propre cod
 |---|---|
 | `make php-check-a` / `-b` / `-c` | Vérifie un lot de la partie 1, indépendamment des deux autres |
 | `make php-check` | Vérifie l'API PHP pur complète contre le contrat |
+| `make sf-atelier` | Atelier pratique Symfony (`c="--filter=A1"` pour un seul exercice) |
 | `make sf-kata` | Kata Doctrine & DQL (`c="--filter=K05"` pour un seul exercice) |
 | `make dql q="SELECT ..."` | Exécute une requête DQL |
 | `make sf-test` · `make sf-check` | Tests PHPUnit · contrat sur l'API Symfony |

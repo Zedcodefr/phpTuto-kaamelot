@@ -21,10 +21,15 @@
         <testsuite name="app">
             <directory>tests</directory>
             <exclude>tests/Kata</exclude>
+            <exclude>tests/Atelier</exclude>
         </testsuite>
         <!-- Kata Doctrine & DQL : make sf-kata -->
         <testsuite name="kata">
             <directory>tests/Kata</directory>
+        </testsuite>
+        <!-- Atelier pratique Symfony (étape 2) : make sf-atelier -->
+        <testsuite name="atelier">
+            <directory>tests/Atelier</directory>
         </testsuite>
     </testsuites>
 

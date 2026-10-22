@@ -15,6 +15,7 @@
 | # | Bloc | Quoi |
 |---|---|---|
 | 1 | Cours Symfony | [Principes](01-principes.md), [particularités](02-particularites.md), [visite du projet](03-visite-du-projet.md) + quiz |
+| 1 bis | [Atelier pratique](05-atelier-pratique.md) | 5 exercices avec tests (`make sf-atelier`) : route et service, contrainte de validation, écouteur d'événements, exception métier, commande console |
 | 2 | [Doctrine & DQL](../03-doctrine/README.md) | ORM, relations, DQL + quiz |
 | 3 | [Kata Doctrine](../03-doctrine/04-kata-doctrine.md) | K01 → K16 et K20 + débrief |
 | 4 | [Backlog](04-backlog-back.md) — mise en place | Entités et migrations de chacun, point d'équipe |
@@ -34,6 +35,7 @@ le kata et le backlog (avec l'IA si besoin : demandez-lui, puis vérifiez dans l
 | 1 | [Principes](01-principes.md) | [Le cycle de vie d'une requête](01-principes.md#2-le-cycle-de-vie-dune-requête), [le grand tableau d'équivalences ASP.NET Core ↔ Symfony](01-principes.md#3-le-grand-tableau-déquivalences), [ce qui va vous surprendre](01-principes.md#5-ce-qui-va-vous-surprendre) | Zoom sur le conteneur, la configuration, les événements |
 | 2 | [Particularités](02-particularites.md) | [Autowiring](02-particularites.md#4-autowiring-en-détail), [Serializer et références circulaires](02-particularites.md#6-serializer), [Validator](02-particularites.md#7-validator), [outils de diagnostic](02-particularites.md#11-outils-de-diagnostic) | Flex, cache, Doctrine (vu en détail dans la partie suivante), sécurité, limite du PATCH, bonnes pratiques |
 | 3 | [Visite du projet](03-visite-du-projet.md) | [PHP pur → Symfony](03-visite-du-projet.md#2-php-pur--symfony--la-table-de-correspondance), [TaskController](03-visite-du-projet.md#3-lecture-commentée-de-taskcontroller), [parcours d'un POST](03-visite-du-projet.md#4-parcours-dun-post-apitasks-de-bout-en-bout) | Arborescence, commandes ; exercice `priority` en bonus |
+| 3 bis | [Atelier pratique](05-atelier-pratique.md) | Les 5 exercices et le débrief | Les bonus (GROUP BY, logs, tests unitaires) |
 | — | [Doctrine & DQL](../03-doctrine/README.md) + kata | voir le README de la partie | |
 | 4 | [Backlog back](04-backlog-back.md) | Socle obligatoire / bonus, travail à 3 sans conflit, définition of done | |
 
