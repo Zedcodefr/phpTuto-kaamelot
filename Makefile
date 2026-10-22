@@ -4,6 +4,12 @@
 #  `make` ou `make help` affiche la liste des commandes.
 # =============================================================================
 
+# Le Makefile a besoin d'un shell Linux : lancé depuis cmd/PowerShell, `echo ... > .env` écrit un .env
+# illisible par Docker (guillemets + CRLF). Sous Windows, on travaille dans WSL 2 (ou le devcontainer).
+ifeq ($(OS),Windows_NT)
+$(error Lancez make depuis un terminal WSL 2 (ou le devcontainer), pas depuis cmd/PowerShell. Supprimez ensuite le fichier .env s'il a été créé)
+endif
+
 # Les conteneurs tournent avec votre UID/GID : les fichiers générés (vendor/,
 # node_modules/, migrations...) vous appartiennent, pas à root.
 export HOST_UID := $(shell id -u)
