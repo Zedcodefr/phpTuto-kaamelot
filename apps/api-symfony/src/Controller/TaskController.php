@@ -8,6 +8,7 @@ use App\Dto\CreateTaskInput;
 use App\Dto\UpdateTaskInput;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
+use App\Service\TaskStats;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -85,5 +86,10 @@ final class TaskController extends AbstractController
         $this->em->flush();
 
         return new Response(status: Response::HTTP_NO_CONTENT);
+    }
+
+    #[Route('/stats', name: 'stats', methods: ['GET'])]
+    public function stats(TaskStats $stats){
+        return $this->json($stats->compute());
     }
 }
