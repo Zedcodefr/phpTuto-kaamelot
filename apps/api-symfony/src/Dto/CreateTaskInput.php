@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Dto;
 
 use App\Enum\TaskStatus;
+use App\Validator\NotShouting;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -17,6 +18,7 @@ final readonly class CreateTaskInput
     public function __construct(
         #[Assert\NotBlank]
         #[Assert\Length(min: 3, max: 255)]
+        #[NotShouting]
         public string $title = '',
 
         #[Assert\Length(max: 2000)]
