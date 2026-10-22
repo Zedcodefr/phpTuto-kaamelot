@@ -21,6 +21,7 @@ Toute question fonctionnelle se tranche en relisant le contrat ; s'il est ambigu
   Sous VS Code, le **devcontainer** fourni suffit : Docker + extension *Dev Containers*, puis *Reopen in Container*
   (`make` et les extensions PHP / Xdebug y sont déjà ; toutes les commandes du parcours s'y lancent telles quelles).
   Sans devcontainer, acceptez *Installer les extensions recommandées* à l'ouverture du dossier dans VS Code.
+- [ ] IDE configuré (VS Code ou PhpStorm, Xdebug compris) : voir [Configurer votre IDE](00-ide.md).
 - [ ] Projet récupéré (application de formation → **Ressources** → `taskboard-projet.zip`, ou dépôt Git).
 - [ ] `make install` terminé sans erreur, puis http://localhost:5173 affiche le front.
 - [ ] `make sf-check` affiche « TOUT EST VERT ».

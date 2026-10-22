@@ -61,7 +61,8 @@ ou à l'étape suivante.
 - [ ] Un éditeur PHP prêt : PhpStorm, ou VS Code avec les extensions recommandées du projet (*PHP Intelephense*, *PHP Debug*,
   *YAML*... : VS Code les propose à l'ouverture du dossier, cliquez *Installer*).
   Sous VS Code, le plus simple est le **devcontainer** fourni : extension *Dev Containers*, puis *Reopen in Container*
-  (`make` et les extensions y sont déjà ; seul Docker est nécessaire sur la machine)
+  (`make` et les extensions y sont déjà ; seul Docker est nécessaire sur la machine).
+  Tout le détail, VS Code et PhpStorm : [Configurer votre IDE](../00-ide.md).
 
 ## Rituels (par événement)
 
