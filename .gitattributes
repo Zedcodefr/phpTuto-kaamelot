@@ -1,3 +1,0 @@
-# Fins de ligne LF partout, même cloné sous Windows avec core.autocrlf=true :
-# Makefile, scripts shell et .env en CRLF cassent make, bash et docker compose.
-* text=auto eol=lf
