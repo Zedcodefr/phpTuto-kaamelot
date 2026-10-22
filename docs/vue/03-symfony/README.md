@@ -21,6 +21,7 @@
 | 1 | [Les principes](01-principes.md) : framework back, cycle de vie, injection de dépendances, tableau d'équivalences Vue / Node ↔ Symfony | Cours + [quiz](#quiz-et-oral) |
 | 2 | [Les particularités](02-particularites.md) : Flex, cache, autowiring, Serializer, Validator, erreurs, sécurité, PATCH | Cours (lecture puis référence) |
 | 3 | [La visite du projet](03-visite-du-projet.md) : `apps/api-symfony` lu à côté de votre `apps/api-php` | Lecture guidée du code |
+| 4 | [L'atelier pratique](04-atelier-pratique.md) : route et service, contrainte de validation, écouteur d'événements, exception métier, commande console | 5 exercices avec tests (`make sf-atelier`) + débrief |
 | ➜ | Étape suivante : [Doctrine & DQL](../04-doctrine/README.md), puis le [projet](../05-projet/backlog-back.md) | |
 
 **À votre rythme** : l'étape est terminée quand vous savez expliquer le parcours d'une requête dans le projet.
@@ -48,6 +49,7 @@ ou lisez les sections de référence.
 | `make sf-routes` | toutes les routes de l'API avec leur contrôleur |
 | `make sf-test` | tests PHPUnit de l'API (`c="--filter=TaskControllerTest"` pour filtrer) |
 | `make sf-check` | vérifie que l'API Symfony respecte le contrat (le même script qu'à l'étape 2) |
+| `make sf-atelier` | tests de l'[atelier pratique](04-atelier-pratique.md) (`c="--filter=A1"` pour un seul exercice) |
 | `make sf-cc` | vide le cache Symfony |
 | `make logs s=api-symfony` | logs du conteneur PHP-FPM |
 | http://localhost:8082/_profiler | le **profiler** : requêtes SQL, événements, validation, sécurité… pour chaque requête |

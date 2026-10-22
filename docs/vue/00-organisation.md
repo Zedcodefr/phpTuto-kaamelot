@@ -40,7 +40,7 @@ ou à l'étape suivante.
 | **Lancement** | Installation vérifiée, lecture du [contrat](../api-contract.md) et de la [charte IA](../00-charte-ia.md) | Tout le monde voit le front sur http://localhost:5173 |
 | **1 — Fondamentaux back-end** | [HTTP côté serveur](01-fondamentaux/01-le-back-end-et-http.md), [SQL](01-fondamentaux/02-sql-et-bases-relationnelles.md) (exercices sur la vraie base), [sécurité](01-fondamentaux/03-securite-cote-serveur.md) + quiz | Chacun sait expliquer le trajet d'une requête et écrire un `JOIN` |
 | **2 — PHP** | [Cours PHP](02-php/README.md) + quiz, exercices 1-2 en **mob programming**, puis **lots A/B/C en parallèle**, puis intégration | `make php-check` vert, front sur `make use-php`, revues orales des lots |
-| **3 — Symfony** | [Cours Symfony](03-symfony/README.md) + quiz, visite guidée du projet | Chacun sait relier chaque morceau du PHP pur à son équivalent Symfony |
+| **3 — Symfony** | [Cours Symfony](03-symfony/README.md) + quiz, visite guidée du projet, [atelier pratique](03-symfony/04-atelier-pratique.md) (`make sf-atelier`) | Chacun sait relier chaque morceau du PHP pur à son équivalent Symfony ; atelier vert + débrief |
 | **4 — Doctrine & DQL** | [Cours Doctrine](04-doctrine/README.md) + quiz, [kata](04-doctrine/04-kata-doctrine.md) individuel | Kata socle vert (`make sf-kata`), débrief collectif |
 | **5 — Projet** | [Backlog](05-projet/backlog-back.md) : chaque dev livre son **socle**, puis attaque les bonus | `make sf-test` et `make sf-check` verts, démo, revues orales, rétro |
 
