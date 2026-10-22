@@ -22,6 +22,24 @@ git switch -c atelier/<prénom>
 make up && make sf-atelier      # 16 tests, presque tous rouges
 ```
 
+### Rappel : déboguer avec Xdebug
+
+Un test reste rouge et vous ne comprenez pas pourquoi ? Posez un point d'arrêt plutôt que des `dump()`.
+
+```bash
+XDEBUG_MODE=debug make up   # active Xdebug (recrée les conteneurs PHP)
+make up                     # le désactive : à faire dès que vous avez fini, Xdebug ralentit chaque requête
+```
+
+- **VS Code** (ou le devcontainer) : extension *PHP Debug*, configuration **« Xdebug - API Symfony »** (fournie dans
+  `.vscode/launch.json`), F5, un point d'arrêt, puis `curl http://localhost:8082/api/tasks/stats`.
+- **PhpStorm** : *Settings › PHP › Servers*, un serveur nommé **`taskboard-symfony`** (le nom compte : c'est celui
+  qu'annonce le conteneur), host `localhost`, port `8082`, mapping `apps/api-symfony` → `/app`. Puis l'icône
+  *Start Listening for PHP Debug Connections*.
+- Les tests aussi s'arrêtent sur vos points d'arrêt quand l'éditeur écoute : `make sf-atelier c="--filter=A4"`.
+- Une requête ne répond plus (`curl` bloqué, `make sf-check` affiche « Impossible de joindre ») ? L'éditeur est
+  presque toujours arrêté sur un point d'arrêt : continuez l'exécution, ou repassez en `make up` sans Xdebug.
+
 ---
 
 ## A0 — Échauffement : faire parler Symfony

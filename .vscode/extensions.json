@@ -1,0 +1,22 @@
+{
+  // VS Code propose ces extensions à l'ouverture du dossier (« Installer les extensions recommandées »).
+  // Dans le devcontainer, elles sont installées automatiquement (.devcontainer/devcontainer.json).
+  "recommendations": [
+    // PHP : autocomplétion, navigation, imports automatiques, erreurs à la frappe (sans PHP installé sur le poste)
+    "bmewburn.vscode-intelephense-client",
+    // Débogage pas à pas avec Xdebug (configurations fournies dans .vscode/launch.json)
+    "xdebug.php-debug",
+    // YAML de config/ (Symfony) et compose.yaml : coloration, indentation, erreurs de syntaxe
+    "redhat.vscode-yaml",
+    // .env de Symfony
+    "mikestead.dotenv",
+    // Respecte .editorconfig (indentation, fins de ligne)
+    "EditorConfig.EditorConfig",
+    // Lint du front React (oxlint)
+    "oxc.oxc-vscode",
+    // Conteneurs : voir les services, leurs logs, ouvrir un shell
+    "ms-azuretools.vscode-containers",
+    // Rouvrir le projet dans le devcontainer (Reopen in Container)
+    "ms-vscode-remote.remote-containers"
+  ]
+}

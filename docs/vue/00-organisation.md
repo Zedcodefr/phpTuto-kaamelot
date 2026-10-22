@@ -58,7 +58,8 @@ ou à l'étape suivante.
 - [ ] Projet de départ téléchargé depuis la page *Ressources* du support, puis `make install` sans erreur
 - [ ] http://localhost:5173 affiche le front, http://localhost:8082/api/health répond `{"status":"ok"}`
 - [ ] `make php-check-a` affiche « à implémenter » (c'est normal : c'est votre travail)
-- [ ] Un éditeur PHP prêt : PhpStorm, ou VS Code avec les extensions *PHP Intelephense* et *PHP Debug*.
+- [ ] Un éditeur PHP prêt : PhpStorm, ou VS Code avec les extensions recommandées du projet (*PHP Intelephense*, *PHP Debug*,
+  *YAML*... : VS Code les propose à l'ouverture du dossier, cliquez *Installer*).
   Sous VS Code, le plus simple est le **devcontainer** fourni : extension *Dev Containers*, puis *Reopen in Container*
   (`make` et les extensions y sont déjà ; seul Docker est nécessaire sur la machine)
 

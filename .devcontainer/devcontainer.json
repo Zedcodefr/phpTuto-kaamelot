@@ -29,12 +29,12 @@
         "xdebug.php-debug",
         "oxc.oxc-vscode",
         "EditorConfig.EditorConfig",
-        "mikestead.dotenv"
+        "mikestead.dotenv",
+        "redhat.vscode-yaml",
+        "ms-azuretools.vscode-containers"
       ],
+      // Les autres réglages (PHP, YAML Symfony) sont dans .vscode/settings.json, lu aussi dans le conteneur
       "settings": {
-        "intelephense.environment.phpVersion": "8.4.0",
-        "php.validate.enable": false,
-        "php.suggest.basic": false,
         "typescript.tsdk": "apps/front/node_modules/typescript/lib"
       }
     }

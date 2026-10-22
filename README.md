@@ -42,7 +42,9 @@ make help      # toutes les commandes
 
 **VS Code (devcontainer)** : avec l'extension *Dev Containers*, ouvrez le dossier puis *Reopen in Container*.
 Vous n'avez alors besoin que de Docker (pas de `make` à installer) : le terminal intégré a `make` et pilote la stack
-avec le Docker de votre machine, et les extensions PHP / Xdebug / oxc sont installées. Toutes les commandes du parcours
+avec le Docker de votre machine, et les extensions PHP / Xdebug / YAML / oxc sont installées.
+Sans devcontainer, VS Code propose les mêmes extensions à l'ouverture du dossier (*Installer les extensions recommandées*,
+liste dans `.vscode/extensions.json`). Toutes les commandes du parcours
 (`make ...`, `curl http://localhost:8081/...`) fonctionnent telles quelles ; les URL s'ouvrent dans le navigateur de la machine.
 
 | URL | Quoi |

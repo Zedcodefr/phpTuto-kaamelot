@@ -214,7 +214,7 @@ Puis, dans l'IDE, écouter les connexions de débogage sur le **port 9003**, ave
 
 **PhpStorm**
 
-1. *Settings → PHP → Servers* : ajouter un serveur nommé `localhost`, port `8081`, cocher *Use path mappings*, associer `apps/api-php` à `/app`.
+1. *Settings → PHP → Servers* : ajouter un serveur nommé **`taskboard-php`** (le nom annoncé par le conteneur, voir `PHP_IDE_CONFIG` dans `compose.yaml`), host `localhost`, port `8081`, cocher *Use path mappings*, associer `apps/api-php` à `/app`.
 2. Cliquer sur l'icône téléphone *Start Listening for PHP Debug Connections*.
 3. Poser un point d'arrêt, lancer `curl http://localhost:8081/api/tasks` : PhpStorm s'arrête.
 

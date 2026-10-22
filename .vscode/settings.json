@@ -1,0 +1,32 @@
+{
+  // Réglages partagés du projet (PHP tourne dans Docker, pas sur le poste)
+  "intelephense.environment.phpVersion": "8.4.0",
+  // Désactive la validation PHP intégrée de VS Code, qui cherche un PHP local : Intelephense s'en charge
+  "php.validate.enable": false,
+  "php.suggest.basic": false,
+
+  // Tags YAML propres à Symfony (sinon l'extension YAML les signale comme des erreurs)
+  "yaml.customTags": [
+    "!php/const scalar",
+    "!php/enum scalar",
+    "!php/object scalar",
+    "!tagged_iterator scalar",
+    "!tagged_iterator mapping",
+    "!tagged_locator scalar",
+    "!tagged_locator mapping",
+    "!service_locator mapping",
+    "!service_closure scalar",
+    "!closure scalar",
+    "!abstract scalar"
+  ],
+
+  // Le cache Symfony change sans arrêt : inutile de le surveiller ou d'y chercher
+  "files.watcherExclude": {
+    "**/var/**": true,
+    "**/node_modules/**": true
+  },
+  "search.exclude": {
+    "**/var/**": true,
+    "**/vendor/**": true
+  }
+}
