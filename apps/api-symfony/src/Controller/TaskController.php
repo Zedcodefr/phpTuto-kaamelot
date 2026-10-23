@@ -99,6 +99,10 @@ final class TaskController extends AbstractController
     #[Route('/{id}/complete', name: 'complete', methods: ['POST'])]
     public function complete(Task $task): JsonResponse
     {
-        return $this->json($task->complete());
+       $task->complete();
+
+       $this->em->flush();
+
+        return $this->json($task);
     }
 }

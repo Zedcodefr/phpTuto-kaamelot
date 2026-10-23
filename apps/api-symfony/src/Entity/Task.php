@@ -92,6 +92,8 @@ class Task
         {
             throw new TaskAlreadyDone("Task is already done", 1);
         }
+
+        $this->changeStatus(TaskStatus::Done);
         return $this;
     }
 }
