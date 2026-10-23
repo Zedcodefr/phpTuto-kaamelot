@@ -92,4 +92,12 @@ final class TaskController extends AbstractController
     public function stats(TaskStats $stats){
         return $this->json($stats->compute());
     }
+
+    #[Route('/{id}/complete', name: 'complete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function complete(Task $task){
+        $task->complete();
+        $this->em->flush();
+
+        return $this->json($task);
+    }
 }
