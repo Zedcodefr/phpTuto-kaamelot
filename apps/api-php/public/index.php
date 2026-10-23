@@ -20,11 +20,31 @@ require dirname(__DIR__) . '/vendor/autoload.php';
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
+// echo 'debug';
+
 // Les en-têtes doivent être envoyés AVANT le moindre echo
 header('Content-Type: application/json; charset=utf-8');
 
+static $counter = 0;
+
 if ($method === 'GET' && $path === '/api/health') {
-    echo json_encode(['status' => 'ok']);
+    $counter ++;
+    echo json_encode(['status' => 'ok', 'counter' => $counter]);
+    return;
+}
+
+if ($method === 'GET' && $path === '/api/tasks') {
+    echo json_encode([
+        ['id' => 1, 'title' => 'Apprendre PHP', 'description' => null, 'status' => 'todo', 'createdAt' => (new \DateTimeImmutable())],
+        ['id' => 2, 'title' => 'Apprendre PHP', 'description' => null, 'status' => 'todo', 'createdAt' => (new \DateTimeImmutable())],
+        ['id' => 3, 'title' => 'Apprendre PHP', 'description' => null, 'status' => 'todo', 'createdAt' => (new \DateTimeImmutable())]
+    ]);
+    // return    <<<'JSON'
+    //     [
+    //             {"id":"1","title":"...","description":null,"status":"todo","createdAt":"2026-10-15T09:30:00+02:00"}
+    //     ]
+    //     JSON
+    //     ;
 
     return;
 }
@@ -39,3 +59,5 @@ echo json_encode([
     'status' => 404,
     'detail' => "No route for $method $path",
 ]);
+
+error_log(print_r($_SERVER, true));

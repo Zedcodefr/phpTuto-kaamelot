@@ -18,7 +18,12 @@ final class A1StatsTest extends AtelierTestCase
         $this->client->request('GET', '/api/tasks/stats');
 
         self::assertResponseIsSuccessful();
-        self::assertSame(['total', 'todo', 'in_progress', 'done'], array_keys($this->json()));
+
+        $jsonResult = $this->json();
+
+        $arrayResult = array_keys($jsonResult);
+
+        self::assertSame(['total', 'todo', 'in_progress', 'done'], $arrayResult);
         foreach ($this->json() as $key => $value) {
             self::assertIsInt($value, "« $key » doit être un entier");
         }
