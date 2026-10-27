@@ -15,12 +15,12 @@ declare(strict_types=1);
 
 return [
     'L01' => [
-        'requetes' => null,          // int : combien de requêtes SQL pour les trois lectures ?
-        'a_et_c_identiques' => null, // bool : $a === $c ?
+        'requetes' => 2,          // int : combien de requêtes SQL pour les trois lectures ?
+        'a_et_c_identiques' => true, // bool : $a === $c ?
     ],
     'L02' => [
-        'requetes' => null,          // int : combien de requêtes SQL au total ?
-        'updates' => null,           // int : combien d'UPDATE parmi elles ?
+        'requetes' => 3,          // int : combien de requêtes SQL au total ?
+        'updates' => 1,           // int : combien d'UPDATE parmi elles ?
     ],
     'L03' => [
         'requetes_avant_flush' => null, // int : requêtes juste après persist()
