@@ -32,12 +32,20 @@ final class TaskStats
         $cases = TaskStatus::cases();
         $list = [];
 
-        array_push($list, ['total' => $count]);
+        // array_push($list, ['total' => $count]);
+
+        // yield ['total' => $count];
+
+        $list['total'] = $count;
 
         foreach($cases as $case)
         {
             $count = $this->taskRepository->count(['status' => $case]);
-            array_push($list, [$case->value => $count]);
+
+            $list["$case->value"] = $count;
+            // array_push($list, [$case->value => $count]);
+
+            //yield [$case->value => $count];
         }
         return $list;
     }
