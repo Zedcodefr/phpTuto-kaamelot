@@ -110,7 +110,7 @@ php-psql: ## Console SQL sur la base de l'API PHP pur
 	$(DC) exec db psql -U app -d taskboard_php
 
 ##@ Partie 2 - API Symfony (http://localhost:8082)
-.PHONY: sf-sh sf sf-composer sf-cc sf-routes sf-entity sf-migration sf-migrate sf-db-reset sf-test sf-kata sf-atelier dql sql sf-check sf-psql
+.PHONY: sf-sh sf sf-composer sf-cc sf-routes sf-entity sf-migration sf-migrate sf-db-reset sf-test sf-kata sf-labo sf-atelier dql sql sf-check sf-psql
 
 sf-sh: ## Ouvre un shell dans le conteneur Symfony
 	$(SF) bash
@@ -152,6 +152,12 @@ sf-kata: ## Kata Doctrine & DQL (make sf-kata c="--filter=K05")
 	$(SF) php bin/console doctrine:migrations:migrate --env=test --no-interaction --allow-no-migration -q
 	$(SF) php bin/console doctrine:fixtures:load --env=test --group=kata --no-interaction -q
 	$(SF) php bin/phpunit --testsuite kata --testdox $(c)
+
+sf-labo: ## Labo Doctrine : pronostic puis expérience (make sf-labo c="--filter=L01")
+	$(SF) php bin/console doctrine:database:create --env=test --if-not-exists -q
+	$(SF) php bin/console doctrine:migrations:migrate --env=test --no-interaction --allow-no-migration -q
+	$(SF) php bin/console doctrine:fixtures:load --env=test --group=kata --no-interaction -q
+	$(SF) php bin/phpunit --testsuite labo --testdox --display-skipped $(c)
 
 sf-atelier: ## Atelier pratique Symfony, étape 2 (make sf-atelier c="--filter=A1")
 	$(SF) php bin/console doctrine:database:create --env=test --if-not-exists -q

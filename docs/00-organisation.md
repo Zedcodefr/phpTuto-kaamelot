@@ -42,7 +42,7 @@ si vous avancez vite, passez aux bonus ou à l'étape suivante.
 | | **Revues orales des lots** + débrief | Démo commune |
 | **2 — Symfony** | [Symfony](02-symfony/README.md) : principes, particularités, [visite du projet](02-symfony/03-visite-du-projet.md) + quiz | F5 — routing + page détail |
 | | [Atelier pratique](02-symfony/05-atelier-pratique.md) : 5 exercices avec tests (`make sf-atelier`), seul ou en binôme sur `atelier/<prénom>` (jamais mergée), puis débrief | (suite F5) |
-| **3 — Doctrine & DQL** | [Doctrine](03-doctrine/README.md) : ORM et mapping, relations, DQL et QueryBuilder + quiz | F6 — formulaire de création (422) |
+| **3 — Doctrine & DQL** | [Labo Doctrine](03-doctrine/00-labo-doctrine.md) en collectif (`make sf-labo`) : pronostic, exécution, explication, puis [cours](03-doctrine/README.md) en référence + quiz | F6 — formulaire de création (422) |
 | | [Kata Doctrine](03-doctrine/04-kata-doctrine.md) : K01 → K16 + K20 obligatoires, le reste en bonus ; débrief K06 / K12 / K20 | F7 — statut et suppression · relecture d'une PR back |
 | **4 — Projet** | [Backlog](02-symfony/04-backlog-back.md) : chacun pose ses entités et migrations (ordre de passage sur `Task`), puis livre son **socle obligatoire**, puis des bonus. B1 projets · B2 authentification · B3 filtres/pagination + commentaires | F8 projets · F9 authentification · F10 commentaires (mocks conformes au contrat en attendant les livraisons back) ; F11 en bonus |
 | | Intégration (`make sf-test`, `make sf-check`, front branché sur Symfony), **démo, revues orales, rétrospective** | idem |
@@ -54,7 +54,7 @@ Une équipe qui termine une étape enchaîne directement sur la suivante : il n'
 | | Socle (dans la formation) | Bonus / suite sur le projet |
 |---|---|---|
 | PHP | Toute l'API Tâches en PHP pur (`make php-check` vert) | Bonus des exercices |
-| Doctrine | Cours + kata K01 → K16 et K20 | K17 à K21 restants |
+| Doctrine | Labo L01 → L09, cours + kata K01 → K16 et K20 | K17 à K21 restants |
 | Backlog Symfony | Le **socle** de chaque dev (voir le [backlog](02-symfony/04-backlog-back.md)) | Tickets bonus, parties restantes du contrat |
 | Front | F1 → F10 | F11 et les bonus des tickets |
 
