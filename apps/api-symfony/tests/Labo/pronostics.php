@@ -3,57 +3,55 @@
 declare(strict_types=1);
 
 /*
- * LABO DOCTRINE — vos pronostics.
+ * LABO DOCTRINE — pronostics justes (formateur).
  *
- * Pour chaque expérience : lisez le code du test (tests/Labo/LxxTest.php), remplacez les null
- * par ce que vous pensez qu'il va se passer, PUIS lancez : make sf-labo c="--filter=L01"
+ * cp formateur/solutions/doctrine-labo/pronostics.php apps/api-symfony/tests/Labo/
+ * make sf-labo   # 9/9 verts
  *
- * Tant qu'un pronostic vaut null, l'expérience ne s'exécute pas (on parie avant de regarder).
- * Un pronostic faux n'est pas un échec : c'est exactement ce qu'on vient chercher.
- * Ce fichier ne se committe pas : `git restore apps/api-symfony/tests/Labo/pronostics.php` à la fin.
+ * Le pourquoi de chaque réponse est dans formateur/labo-doctrine.md.
  */
 
 return [
     'L01' => [
-        'requetes' => null,          // int : combien de requêtes SQL pour les trois lectures ?
-        'a_et_c_identiques' => null, // bool : $a === $c ?
+        'requetes' => 2,               // find() n°2 servi par l'Identity Map ; findOneBy() interroge la base
+        'a_et_c_identiques' => true,   // … mais renvoie l'objet déjà en mémoire (une ligne = un objet)
     ],
     'L02' => [
-        'requetes' => null,          // int : combien de requêtes SQL au total ?
-        'updates' => null,           // int : combien d'UPDATE parmi elles ?
+        'requetes' => 3,               // 2 SELECT + 1 UPDATE
+        'updates' => 1,                // « Mort sur le Nil » n'a pas changé : rien à écrire
     ],
     'L03' => [
-        'requetes_avant_flush' => null, // int : requêtes juste après persist()
-        'id_connu_avant_flush' => null, // bool : getId() renvoie-t-il déjà un entier juste après persist() ?
-        'requetes_apres_flush' => null, // int : total depuis le début
+        'requetes_avant_flush' => 0,   // persist() ne fait que planifier
+        'id_connu_avant_flush' => false, // colonne IDENTITY : l'id vient de la base, à l'INSERT
+        'requetes_apres_flush' => 1,   // l'INSERT (dans une transaction ouverte par flush)
     ],
     'L04' => [
-        'apres_find' => null,        // int : requêtes après find()
-        'apres_getAuthor' => null,   // int : … après getAuthor()
-        'apres_getId' => null,       // int : … après getAuthor()->getId()
-        'apres_getName' => null,     // int : … après getAuthor()->getName()
+        'apres_find' => 1,
+        'apres_getAuthor' => 1,        // un objet fantôme (lazy) : seul l'author_id est connu
+        'apres_getId' => 1,            // l'identifiant ne déclenche pas le chargement
+        'apres_getName' => 2,          // le premier vrai accès charge l'auteur
     ],
     'L05' => [
-        'updates' => null,           // int : combien d'UPDATE pendant le flush ?
-        'auteur_en_base' => null,    // string : le nom de l'auteur de « Kafka sur le rivage » relu en base
+        'updates' => 0,                // Author::$books est le côté inverse (mappedBy) : ignoré à l'écriture
+        'auteur_en_base' => 'Haruki Murakami',
     ],
     'L06' => [
-        'requetes_boucle' => null,     // int : findAll() + la boucle sur les auteurs
-        'requetes_fetch_join' => null, // int : la même chose avec un fetch join
+        'requetes_boucle' => 5,        // 1 + 4 auteurs distincts (pas 1 + 9 : l'Identity Map dédoublonne)
+        'requetes_fetch_join' => 1,
     ],
     'L07' => [
-        'critique_acceptee' => null, // bool : le flush avec la nouvelle critique passe-t-il ?
-        'etiquette_acceptee' => null, // bool : le flush avec la nouvelle étiquette passe-t-il ?
+        'critique_acceptee' => true,   // Book::$reviews a cascade: ['persist']
+        'etiquette_acceptee' => false, // Book::$tags non : ORMInvalidArgumentException
     ],
     'L08' => [
-        'lignes_modifiees' => null,     // int : ce que renvoie execute()
-        'en_memoire_apres_update' => null, // bool : $book->isOutOfPrint() juste après l'UPDATE
-        'apres_nouveau_find' => null,   // bool : isOutOfPrint() sur le résultat d'un nouveau find()
-        'apres_refresh' => null,        // bool : isOutOfPrint() après refresh()
+        'lignes_modifiees' => 1,
+        'en_memoire_apres_update' => false, // le DQL écrit en base sans passer par l'Unit of Work
+        'apres_nouveau_find' => false,      // find() renvoie l'objet de l'Identity Map, sans requête
+        'apres_refresh' => true,            // refresh() relit la ligne
     ],
     'L09' => [
-        'entites_findAll' => null,   // int : combien d'objets Book créés par la version A ?
-        'entites_where' => null,     // int : … par la version B ?
-        'entites_count' => null,     // int : … par la version C ?
+        'entites_findAll' => 9,
+        'entites_where' => 2,
+        'entites_count' => 0,
     ],
 ];
