@@ -32,7 +32,10 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k01FindAllOrderedByTitle(): array
     {
-        throw new \LogicException('TODO K01');
+        return $this->createQueryBuilder('b')
+            ->orderBy('b.title', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -44,7 +47,13 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k02FindByAuthorName(string $name): array
     {
-        throw new \LogicException('TODO K02');
+        return $this->createQueryBuilder('b')
+            ->join('b.author', 'a')
+            ->where('a.name = :name')
+            ->orderBy('b.title', 'ASC')
+            ->getQuery()
+            ->setParameter('name', $name)
+            ->getResult();
     }
 
     /**
@@ -67,7 +76,10 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k04FindWithAtLeastPages(int $minPages): array
     {
-        throw new \LogicException('TODO K04');
+        return $this->getEntityManager()
+        ->createQuery('SELECT b FROM App\Kata\Entity\Book b WHERE b.pages >= :minPages ORDER BY b.pages DESC')
+        ->setParameter('minPages', $minPages)
+        ->getResult();
     }
 
     /**
@@ -91,7 +103,13 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k06FindOneWithReviews(int $id): ?Book
     {
-        throw new \LogicException('TODO K06');
+        return $this->createQueryBuilder('b')
+            ->join('b.reviews', 'r')
+            ->addSelect('r')
+            ->where('b.id = :id')
+            ->getQuery()
+            ->setParameter('id', $id)
+            ->getOneOrNullResult();
     }
 
     /**
