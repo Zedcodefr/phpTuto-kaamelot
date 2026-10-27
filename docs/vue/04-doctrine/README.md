@@ -11,7 +11,7 @@
 ## Place dans le parcours
 
 ```
-1 Fondamentaux ─▶ 2 PHP pur ─▶ 3 Symfony ─▶ ★ 4 Doctrine & DQL (cours + kata) ★ ─▶ 5 Projet (B1/B2/B3)
+1 Fondamentaux ─▶ 2 PHP pur ─▶ 3 Symfony ─▶ ★ 4 Doctrine & DQL (labo + cours + kata) ★ ─▶ 5 Projet (B1/B2/B3)
 ```
 
 À l'étape 2, vous avez écrit vos requêtes SQL à la main avec PDO et transformé chaque ligne en objet `Task`
@@ -35,18 +35,21 @@ il parle à la base.
 > **À votre rythme** : une étape est terminée quand elle est **comprise**. Si vous avancez vite, passez aux bonus
 > ou à l'étape suivante. Ce qui compte, c'est de **comprendre** ce que vous écrivez.
 
-1. **Cours** (avec leurs quiz) : chapitres 1 à 3 ci-dessous.
-2. **Kata** individuel : 21 petits exercices sous forme de tests à faire passer, socle **K01 → K16 + K20**.
-3. **Débrief collectif** sur K06, K12 et K20.
-4. **Projet** : les tickets B1/B2/B3 réutilisent directement ce que le kata vous a fait pratiquer.
+1. **[Labo](00-labo-doctrine.md)** en collectif : 9 expériences où vous pariez sur le SQL que Doctrine va envoyer,
+   puis vous le lisez (`make sf-labo`). C'est là qu'on voit l'Unit of Work, l'Identity Map, les relations et le N+1.
+2. **Cours** (avec leurs quiz) : chapitres 1 à 3 ci-dessous, pour mettre des mots et des détails sur ce que le labo a montré.
+3. **Kata** individuel : 21 petits exercices sous forme de tests à faire passer, socle **K01 → K16 + K20**.
+4. **Débrief collectif** sur K06, K12 et K20.
+5. **Projet** : les tickets B1/B2/B3 réutilisent directement ce que le kata vous a fait pratiquer.
 
 ## Contenu : à voir en séance / référence
 
-Les chapitres sont complets ; en séance, on ne voit que l'essentiel. Le reste sert de **référence pendant le kata
+Les chapitres sont complets ; en séance, l'essentiel passe par le labo. Le reste sert de **référence pendant le kata
 et le projet** (l'IA peut vous l'expliquer aussi : vérifiez ensuite avec `make dql` et le profiler).
 
 | # | Chapitre | À voir en séance | Référence pendant le kata / le projet |
 |---|---|---|---|
+| 0 | [Labo : prédire le SQL (L01 → L09)](00-labo-doctrine.md) | Tout, en collectif | Les « Et si… ? » à refaire seul |
 | 1 | [ORM, Unit of Work et mapping](01-orm-et-mapping.md) | [Pourquoi un ORM](01-orm-et-mapping.md#11-pourquoi-un-orm), [EntityManager : pas un store Pinia](01-orm-et-mapping.md#13-lentitymanager--surtout-pas-un-store-pinia), [Unit of Work et états d'une entité](01-orm-et-mapping.md#15-lunit-of-work-et-les-états-dune-entité), [migrations à trois](01-orm-et-mapping.md#travailler-à-trois-sans-se-marcher-dessus) | Transactions, détail du mapping, listeners (B3), fixtures, repositories |
 | 2 | [Relations](02-relations.md) | [Côté propriétaire / inverse](02-relations.md#22-côté-propriétaire-côté-inverse--le-piège), [cascade et orphanRemoval](02-relations.md#25-cascade-orphanremoval-et-ondelete), [le problème N+1](02-relations.md#27-le-problème-n1) | Collections, chargement paresseux, sérialisation, application au projet |
 | 3 | [DQL et QueryBuilder](03-dql-et-query-builder.md) | [La règle d'or](03-dql-et-query-builder.md#31-la-règle-dor--le-travail-se-fait-en-base), [SQL ↔ DQL ↔ JS ↔ Prisma](03-dql-et-query-builder.md#33-sql--dql--js--prisma), [paramètres](03-dql-et-query-builder.md#34-paramètres), [QueryBuilder](03-dql-et-query-builder.md#35-le-querybuilder), [fetch join et pagination](03-dql-et-query-builder.md#38-fetch-join-et-pagination) | Hydratation, `SELECT NEW`, `UPDATE` DQL, SQL natif, [anti-sèche](03-dql-et-query-builder.md#313-anti-sèche) |
@@ -63,6 +66,7 @@ L'IA est autorisée ; l'exigence est de savoir expliquer chaque requête et le S
 | `make sf c='doctrine:query:dql --show-sql "SELECT ..."'` | Affiche le **SQL généré** à partir d'un DQL, sans l'exécuter |
 | `make sql q="SELECT * FROM kata_book"` | Exécute du **SQL** brut sur la base Symfony |
 | `make sf-psql` | Console PostgreSQL (pour `EXPLAIN`, `\d kata_book`…) |
+| `make sf-labo c="--filter=L01"` | Lance une expérience du labo (après avoir noté le pronostic) |
 | `make sf-kata` / `make sf-kata c="--filter=K05"` | Lance le kata (tous les tests, ou un seul) |
 | `make sf c="doctrine:mapping:info"` | Liste les entités connues de Doctrine |
 | `make sf c="doctrine:schema:validate"` | Vérifie le mapping **et** sa cohérence avec la base |

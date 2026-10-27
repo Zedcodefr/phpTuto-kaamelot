@@ -22,6 +22,7 @@
             <directory>tests</directory>
             <exclude>tests/Kata</exclude>
             <exclude>tests/Atelier</exclude>
+            <exclude>tests/Labo</exclude>
         </testsuite>
         <!-- Kata Doctrine & DQL : make sf-kata -->
         <testsuite name="kata">
@@ -30,6 +31,10 @@
         <!-- Atelier pratique Symfony (étape 2) : make sf-atelier -->
         <testsuite name="atelier">
             <directory>tests/Atelier</directory>
+        </testsuite>
+        <!-- Labo Doctrine : pronostic, puis expérience (make sf-labo) -->
+        <testsuite name="labo">
+            <directory>tests/Labo</directory>
         </testsuite>
     </testsuites>
 
