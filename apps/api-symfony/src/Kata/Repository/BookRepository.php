@@ -103,7 +103,7 @@ class BookRepository extends ServiceEntityRepository
     public function k06FindOneWithReviews(int $id): ?Book
     {
         return $this->createQueryBuilder('b')
-            ->join('b.review', 'r')
+            ->join('b.reviews', 'r')
             ->addSelect('r')
             ->where('b.id = :id')
             ->setParameter('id', $id)
