@@ -29,7 +29,23 @@ final class Library
      */
     public function k17AddBook(string $title, Author $author, \DateTimeImmutable $publishedAt, int $pages, string ...$tagNames): Book
     {
-        throw new \LogicException('TODO K17');
+        $book = new Book($title, $author, $publishedAt, $pages);
+
+        foreach($tagNames as $tagName){
+            $tag = $this->em->getRepository(Tag::class)->findOneBy(['name' => $tagName]);
+
+            if ($tag === null) {
+                $tag = new Tag($tagName);
+                $this->em->persist($tag);
+            }
+
+            $book->addTag($tag);
+        }
+
+        $this->em->persist($book);
+        $this->em->flush();
+
+        return $book;
     }
 
     /**
@@ -47,7 +63,10 @@ final class Library
      */
     public function k19RenameTag(string $oldName, string $newName): void
     {
-        throw new \LogicException('TODO K19');
+        $tag = $this->em->getRepository(Tag::class)->findOneBy(['name' => $oldName]);
+        $tag->rename($newName);
+
+        $this->em->flush();
     }
 
     /**
@@ -57,7 +76,15 @@ final class Library
      */
     public function k20TransferBooks(Author $from, Author $to): int
     {
-        throw new \LogicException('TODO K20');
+        $books = $this->em->getRepository(Book::class)->findBy(['author' => $from]);
+
+        foreach($books as $book){
+            $book->setAuthor($to);
+        }
+
+        $this->em->flush();
+
+        return count($books);
     }
 
     /**
