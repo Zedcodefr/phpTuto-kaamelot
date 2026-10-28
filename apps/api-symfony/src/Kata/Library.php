@@ -54,7 +54,11 @@ final class Library
      */
     public function k18AddReview(Book $book, int $rating, string $comment): Review
     {
-        throw new \LogicException('TODO K18');
+        $review = new Review($book, $rating, $comment);
+
+        $this->em->flush();
+
+        return $review;
     }
 
     /**
@@ -94,6 +98,12 @@ final class Library
      */
     public function k21DeleteReviewsOfBook(Book $book): int
     {
-        throw new \LogicException('TODO K21');
+        $reviewsCount = count($book->getReviews());
+
+        $book->removeAllReviews();
+
+        $this->em->flush();
+
+        return $reviewsCount;
     }
 }

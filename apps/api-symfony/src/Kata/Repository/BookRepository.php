@@ -6,8 +6,8 @@ namespace App\Kata\Repository;
 
 use App\Kata\Dto\BookSummary;
 use App\Kata\Entity\Book;
+use App\Kata\Entity\Author;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -64,7 +64,12 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k03FindPublishedBetween(\DateTimeImmutable $from, \DateTimeImmutable $to): array
     {
-        throw new \LogicException('TODO K03');
+        return $this->createQueryBuilder('b')
+            ->where('b.publishedAt BETWEEN :from AND :to')
+            ->orderBy('b.publishedAt', 'ASC')
+            ->getQuery()
+            ->setParameters(['from'=> $from, 'to'=> $to])
+            ->getResult();
     }
 
     /**
@@ -77,9 +82,9 @@ class BookRepository extends ServiceEntityRepository
     public function k04FindWithAtLeastPages(int $minPages): array
     {
         return $this->getEntityManager()
-        ->createQuery('SELECT b FROM App\Kata\Entity\Book b WHERE b.pages >= :minPages ORDER BY b.pages DESC')
-        ->setParameter('minPages', $minPages)
-        ->getResult();
+            ->createQuery('SELECT b FROM App\Kata\Entity\Book b WHERE b.pages >= :minPages ORDER BY b.pages DESC')
+            ->setParameter('minPages', $minPages)
+            ->getResult();
     }
 
     /**
@@ -92,7 +97,21 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k05CountBooksPerAuthor(): array
     {
-        throw new \LogicException('TODO K05');
+        $rows = $this->getEntityManager()->createQueryBuilder()
+            ->select('a.name', 'count(b.id) AS nb')
+            ->from(Author::class, 'a')
+            ->leftJoin('a.books', 'b')
+            ->groupBy('a.id')
+            ->orderBy('a.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['name']] = (int) $row['nb'];
+        }
+
+        return $result;
     }
 
     /**

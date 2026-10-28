@@ -132,6 +132,11 @@ class Book
         $this->reviews->removeElement($review);
     }
 
+    public function removeAllReviews(): void
+    {
+        $this->reviews = new ArrayCollection();
+    }
+
     /**
      * @return Collection<int, Tag>
      */
