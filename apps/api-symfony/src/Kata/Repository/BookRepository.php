@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Kata\Repository;
 
 use App\Kata\Dto\BookSummary;
+use App\Kata\Entity\Author;
 use App\Kata\Entity\Book;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Tools\Pagination\Paginator;
@@ -64,7 +65,14 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k03FindPublishedBetween(\DateTimeImmutable $from, \DateTimeImmutable $to): array
     {
-        throw new \LogicException('TODO K03');
+        return $this->createQueryBuilder('b')
+            // ->where('b.publishedAt > :from AND b.publishedAt < :to')
+            ->where('b.publishedAt BETWEEN :from AND :to')
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->orderBy('b.publishedAt', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -91,7 +99,18 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k05CountBooksPerAuthor(): array
     {
-        throw new \LogicException('TODO K05');
+        $result = $this->getEntityManager()->getRepository(Author::class)
+        ->createQueryBuilder('a')
+        ->leftJoin('a.books', 'b')
+        ->groupBy('a.name')
+        ->select('a.name', 'COUNT(b.id) as total')
+        ->orderBy('a.name', 'ASC')
+        ->getQuery()
+        ->getScalarResult();
+
+        $result = array_column($result, 'total', 'name');
+
+        return $result;
     }
 
     /**
@@ -120,7 +139,28 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k07FindAverageRatingsAtLeast(float $minAverage): array
     {
-        throw new \LogicException('TODO K07');
+        $result = $this->createQueryBuilder('b')
+        ->join('b.reviews', 'r')
+        ->select('b.title as title', 'AVG(r.rating) as average')
+        ->groupBy('b.title')
+        ->having('AVG(r.rating)>=:minAverage')
+        ->setParameter('minAverage', $minAverage)
+        ->orderBy('average', 'DESC')
+        ->addOrderBy('title')
+        ->getQuery()
+        ->getScalarResult();
+
+        foreach($result as $r)
+            {
+                $r['average'] = round((float)$r['average'], 2);
+            }
+
+
+        //$result = array_column($result, 'average', 'title');
+
+        //$rounded = array_map(fn ($average) => round((float)$average, 2), $result);
+
+        return $result;
     }
 
     /**
