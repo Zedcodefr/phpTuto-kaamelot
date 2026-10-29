@@ -8,11 +8,13 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Attribute\Ignore;
 
 /**
  * Utilisateur de l'API (≈ IdentityUser en ASP.NET Core Identity).
  * Le mot de passe stocké est toujours un hash, jamais exposé en JSON :
- * c'est pourquoi la sérialisation passe par #[Groups] ou un DTO de sortie (voir étape suivante).
+ * #[Ignore] garantit que même un User sérialisé tel quel reste {id, email, displayName} ;
+ * les réponses de l'API passent en plus par UserOutput.
  */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -58,6 +60,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->displayName;
     }
 
+    #[Ignore]
     public function getUserIdentifier(): string
     {
         return $this->email;
@@ -66,6 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @return list<string>
      */
+    #[Ignore]
     public function getRoles(): array
     {
         return array_values(array_unique([...$this->roles, 'ROLE_USER']));
@@ -81,6 +85,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    #[Ignore]
     public function getPassword(): string
     {
         return $this->password;
