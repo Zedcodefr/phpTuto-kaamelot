@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace App\Kata\Repository;
 
 use App\Kata\Dto\BookSummary;
+use App\Kata\Entity\Author;
 use App\Kata\Entity\Book;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\OffsetPaginator;
 use Doctrine\ORM\Tools\Pagination\Paginator;
+use Doctrine\ORM\Tools\Pagination\Window;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -32,7 +35,10 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k01FindAllOrderedByTitle(): array
     {
-        throw new \LogicException('TODO K01');
+        return $this->createQueryBuilder('b')
+            ->orderBy('b.title', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -44,7 +50,13 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k02FindByAuthorName(string $name): array
     {
-        throw new \LogicException('TODO K02');
+        return $this->createQueryBuilder('b')
+            ->join('b.author', 'a')
+            ->where('a.name = :name')
+            ->setParameter('name', $name)
+            ->orderBy('b.title', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -55,7 +67,13 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k03FindPublishedBetween(\DateTimeImmutable $from, \DateTimeImmutable $to): array
     {
-        throw new \LogicException('TODO K03');
+        return $this->createQueryBuilder('b')
+            ->where('b.publishedAt BETWEEN :from AND :to')
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->orderBy('b.publishedAt', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -67,7 +85,10 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k04FindWithAtLeastPages(int $minPages): array
     {
-        throw new \LogicException('TODO K04');
+        return $this->getEntityManager()
+            ->createQuery('SELECT b FROM ' . Book::class . ' b WHERE b.pages >= :minPages ORDER BY b.pages DESC')
+            ->setParameter('minPages', $minPages)
+            ->getResult();
     }
 
     /**
@@ -80,7 +101,18 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k05CountBooksPerAuthor(): array
     {
-        throw new \LogicException('TODO K05');
+        $query = $this->getEntityManager()->createQueryBuilder()->select('a')->from(Author::class, 'a')
+                    ->leftJoin('a.books', 'b')
+                    ->groupBy('a.id')
+                    ->orderBy('a.name', 'ASC')
+                    ->getQuery()
+                    ->getResult();
+
+        $result = [];
+        foreach($query as $author) {
+            $result[$author->getName()] = (int) count($author->getBooks());
+        }
+        return $result;
     }
 
     /**
@@ -91,7 +123,13 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k06FindOneWithReviews(int $id): ?Book
     {
-        throw new \LogicException('TODO K06');
+       return $this->createQueryBuilder('b')
+           ->leftJoin('b.reviews', 'r')
+           ->addSelect('r')
+           ->where('b.id = :id')
+           ->setParameter('id', $id)
+           ->getQuery()
+           ->getOneOrNullResult();
     }
 
     /**
@@ -103,7 +141,18 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k07FindAverageRatingsAtLeast(float $minAverage): array
     {
-        throw new \LogicException('TODO K07');
+        $qb = $this->createQueryBuilder('b')
+            ->select('b.title, AVG(r.rating) as average')
+            ->leftJoin('b.reviews', 'r')
+            ->groupBy('b.id')
+            ->having('AVG(r.rating) >= :minAverage')
+            ->setParameter('minAverage', $minAverage)
+            ->orderBy('average', 'DESC')
+            ->addOrderBy('b.title', 'ASC');
+
+        $query = $qb->getQuery()->getArrayResult();
+
+        return array_map(fn($row) => ['title' => $row['title'], 'average' => round((float) $row['average'], 2)], $query);
     }
 
     /**
@@ -114,7 +163,13 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k08FindByTag(string $tagName): array
     {
-        throw new \LogicException('TODO K08');
+        return $this->createQueryBuilder('b')
+            ->innerJoin('b.tags', 't')
+            ->where('t.name = :tagName')
+            ->setParameter('tagName', $tagName)
+            ->orderBy('b.title', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -129,7 +184,24 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k09Search(?string $text = null, ?string $authorCountry = null, ?bool $outOfPrint = null): array
     {
-        throw new \LogicException('TODO K09');
+        $qb = $this->createQueryBuilder('b')
+                ->orderBy('b.title', 'ASC');
+
+        if ($text !== null) {
+            $qb->andWhere('LOWER(b.title) LIKE :text')
+               ->setParameter('text', '%' . strtolower($text) . '%');
+        }
+        if ($authorCountry !== null) {
+            $qb->innerJoin('b.author', 'a')
+            ->andWhere('a.country = :authorCountry')
+               ->setParameter('authorCountry', $authorCountry);
+        }
+        if ($outOfPrint !== null) {
+            $qb->andWhere('b.outOfPrint = :outOfPrint')
+               ->setParameter('outOfPrint', $outOfPrint);
+        }
+        return $qb->getQuery()
+                  ->getResult();
     }
 
     /**
@@ -142,7 +214,17 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k10Paginate(int $page, int $limit): array
     {
-        throw new \LogicException('TODO K10');
+        $qb = $this->createQueryBuilder('b')
+        ->orderBy('b.title', 'ASC');
+
+        //Utiliser OffsetPaginator, Doctrine\ORM\Tools\Pagination\Paginator est déprécié
+        $result = (new OffsetPaginator())
+        ->paginate($qb, Window::fromPageNumberAndSize($page, $limit));
+
+        return [
+            'items' => $result->getItems(),
+            'total' => $result->getTotalCount(),
+        ];
     }
 
     /**

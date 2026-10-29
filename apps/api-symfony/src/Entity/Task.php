@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Enum\TaskStatus;
+use App\Exception\TaskAlreadyDone;
 use App\Repository\TaskRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -83,5 +84,13 @@ class Task
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function complete(): void
+    {
+        if($this->status === TaskStatus::Done) {
+            throw new TaskAlreadyDone();
+        }
+        $this->status = TaskStatus::Done;
     }
 }

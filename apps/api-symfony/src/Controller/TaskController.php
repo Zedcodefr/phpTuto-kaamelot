@@ -7,7 +7,9 @@ namespace App\Controller;
 use App\Dto\CreateTaskInput;
 use App\Dto\UpdateTaskInput;
 use App\Entity\Task;
+use App\Exception\TaskAlreadyDone;
 use App\Repository\TaskRepository;
+use App\Service\TaskStats;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -86,4 +88,19 @@ final class TaskController extends AbstractController
 
         return new Response(status: Response::HTTP_NO_CONTENT);
     }
+
+    #[Route('/stats', name: 'stats', methods: ['GET'])]
+    public function stats(TaskStats $stats): JsonResponse
+    {
+        return $this->json($stats->compute());
+    }
+
+    #[Route('/{id}/complete', name: 'complete', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function complete(Task $task): JsonResponse
+    {
+        $task->complete();
+        $this->em->flush();
+        return $this->json($task);
+    }
+
 }
