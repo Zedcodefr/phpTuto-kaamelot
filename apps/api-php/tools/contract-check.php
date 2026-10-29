@@ -35,7 +35,7 @@ function call(string $method, string $url, ?array $body = null): array
         'header' => "Content-Type: application/json\r\nAccept: application/json\r\n",
         'content' => $body === null ? '' : json_encode($body),
         'ignore_errors' => true, // ne pas lever d'erreur sur 4xx/5xx : on veut lire la réponse
-        'timeout' => 5,
+        'timeout' => 30, // Symfony en dev sur un bind mount Windows peut mettre plusieurs secondes
     ]]);
 
     $raw = @file_get_contents($url, false, $context);
