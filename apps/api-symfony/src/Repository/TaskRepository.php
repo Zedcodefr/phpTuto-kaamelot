@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace App\Repository;
 
+use App\Dto\TaskFilter;
 use App\Entity\Task;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -31,5 +33,23 @@ class TaskRepository extends ServiceEntityRepository
             ->orderBy('t.id', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    public function search(TaskFilter $filter): Paginator
+    {
+        $qb = $this->createQueryBuilder('t')
+            ->orderBy('t.id', 'ASC')
+            ->setFirstResult(($filter->page - 1) * $filter->limit)
+            ->setMaxResults($filter->limit);
+
+        if (null !== $filter->status) {
+            $qb->andWhere('t.status = :status')->setParameter('status', $filter->status);
+        }
+        if (null !== $filter->search && '' !== $filter->search) {
+            $qb->andWhere('LOWER(t.title) LIKE :q OR LOWER(t.description) LIKE :q')
+                ->setParameter('q', '%'.mb_strtolower($filter->search).'%');
+        }
+
+        return new Paginator($qb);
     }
 }
