@@ -15,6 +15,9 @@ use Doctrine\Persistence\ObjectManager;
  */
 final class AppFixtures extends Fixture
 {
+    // Références réutilisées par CommentFixtures : 'task-0', 'task-1'...
+    public const TASK_REFERENCE = 'task-';
+
     public function load(ObjectManager $manager): void
     {
         $tasks = [
@@ -24,8 +27,10 @@ final class AppFixtures extends Fixture
             ['Migrer l\'API vers Symfony', null, TaskStatus::Todo],
         ];
 
-        foreach ($tasks as [$title, $description, $status]) {
-            $manager->persist(new Task($title, $description, $status));
+        foreach ($tasks as $i => [$title, $description, $status]) {
+            $task = new Task($title, $description, $status);
+            $manager->persist($task);
+            $this->addReference(self::TASK_REFERENCE . $i, $task);
         }
 
         $manager->flush();
