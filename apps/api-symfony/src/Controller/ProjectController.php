@@ -42,7 +42,7 @@ final class ProjectController extends AbstractController
     #[Route('', name: 'create', methods: ['POST'])]
     public function create(#[MapRequestPayload] CreateProjectInput $input): JsonResponse
     {
-        $project = new Project($input->name, '' === $input->description ? null : $input->description);
+        $project = new Project($input->name, $input->description ?: null);
 
         $this->em->persist($project);
         $this->em->flush();
@@ -59,7 +59,7 @@ final class ProjectController extends AbstractController
             $project->rename($input->name);
         }
         if (null !== $input->description) {
-            $project->describe('' === $input->description ? null : $input->description);
+            $project->describe($input->description ?: null);
         }
 
         $this->em->flush();
