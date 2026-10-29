@@ -6,12 +6,14 @@ namespace App\Controller;
 
 use App\Dto\CreateTaskInput;
 use App\Dto\UpdateTaskInput;
+use App\Dto\TaskFilter;
 use App\Entity\Task;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -31,9 +33,11 @@ final class TaskController extends AbstractController
     }
 
     #[Route('', name: 'list', methods: ['GET'])]
-    public function list(): JsonResponse
+    public function list(#[MapQueryString(validationFailedStatusCode: Response::HTTP_UNPROCESSABLE_ENTITY)] TaskFilter $filter = new TaskFilter()): JsonResponse
     {
-        return $this->json($this->tasks->findAllOrdered());
+        $paginator = $this->tasks->search($filter);
+
+        return $this->json(iterator_to_array($paginator), headers: ['X-Total-Count' => count($paginator)]);
     }
 
     // Task $task : l'entité est chargée automatiquement depuis {id} (EntityValueResolver).
