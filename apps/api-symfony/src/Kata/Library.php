@@ -29,22 +29,7 @@ final class Library
      */
     public function k17AddBook(string $title, Author $author, \DateTimeImmutable $publishedAt, int $pages, string ...$tagNames): Book
     {
-        $book = new Book($title, $author, $publishedAt, $pages);
-
-        foreach (array_unique($tagNames) as $name) {
-            $tag = $this->em->getRepository(Tag::class)->findOneBy(['name' => $name]);
-            if (null === $tag) {
-                $tag = new Tag($name);
-                // Pas de cascade sur Book::$tags : un nouveau Tag doit être persisté explicitement.
-                $this->em->persist($tag);
-            }
-            $book->addTag($tag);
-        }
-
-        $this->em->persist($book);
-        $this->em->flush();
-
-        return $book;
+        throw new \LogicException('TODO K17');
     }
 
     /**
@@ -53,12 +38,7 @@ final class Library
      */
     public function k18AddReview(Book $book, int $rating, string $comment): Review
     {
-        $review = new Review($book, $rating, $comment);
-        // cascade: ['persist'] sur Book::$reviews : le persist($review) est inutile, le livre est déjà managed.
-        $book->addReview($review);
-        $this->em->flush();
-
-        return $review;
+        throw new \LogicException('TODO K18');
     }
 
     /**
@@ -67,14 +47,7 @@ final class Library
      */
     public function k19RenameTag(string $oldName, string $newName): void
     {
-        $tag = $this->em->getRepository(Tag::class)->findOneBy(['name' => $oldName]);
-        if (null === $tag) {
-            throw new \InvalidArgumentException(sprintf('Étiquette "%s" introuvable.', $oldName));
-        }
-
-        // Entité "managed" : Doctrine détecte la modification, pas de persist() nécessaire.
-        $tag->rename($newName);
-        $this->em->flush();
+        throw new \LogicException('TODO K19');
     }
 
     /**
@@ -84,17 +57,7 @@ final class Library
      */
     public function k20TransferBooks(Author $from, Author $to): int
     {
-        // Copie : setAuthor() retire le livre de $from->getBooks() pendant la boucle.
-        $books = $from->getBooks()->toArray();
-
-        foreach ($books as $book) {
-            // Book::$author est le côté propriétaire : c'est lui qui est écrit en base.
-            $book->setAuthor($to);
-        }
-
-        $this->em->flush();
-
-        return count($books);
+        throw new \LogicException('TODO K20');
     }
 
     /**
@@ -104,16 +67,6 @@ final class Library
      */
     public function k21DeleteReviewsOfBook(Book $book): int
     {
-        // Copie : removeReview() modifie la collection pendant la boucle.
-        $reviews = $book->getReviews()->toArray();
-
-        foreach ($reviews as $review) {
-            // orphanRemoval: true : une critique retirée de la collection est supprimée au flush.
-            $book->removeReview($review);
-        }
-
-        $this->em->flush();
-
-        return count($reviews);
+        throw new \LogicException('TODO K21');
     }
 }
