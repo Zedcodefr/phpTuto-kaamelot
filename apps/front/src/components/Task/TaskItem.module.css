@@ -1,0 +1,21 @@
+.item {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.title {
+  font-weight: bold;
+}
+
+.grey {
+  color: red;
+}
+
+.orange {
+  color: orange;
+}
+
+.green {
+  color: lightgreen;
+}
