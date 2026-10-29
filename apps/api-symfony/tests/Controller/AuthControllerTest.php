@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use App\Entity\ApiToken;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\Attributes\DataProvider;
@@ -111,6 +112,91 @@ final class AuthControllerTest extends WebTestCase
         $this->client->request('POST', '/api/auth/register', server: ['CONTENT_TYPE' => 'application/json'], content: '{oups');
 
         self::assertResponseStatusCodeSame(400);
+    }
+
+    public function testLoginReturnsTokenAndUser(): void
+    {
+        $this->createUser('carol@test.local', 'motdepasse');
+
+        $this->login(['email' => 'carol@test.local', 'password' => 'motdepasse']);
+
+        self::assertResponseStatusCodeSame(200);
+        $body = $this->json();
+        self::assertSame(['token', 'user'], array_keys($body));
+        self::assertMatchesRegularExpression('/^[0-9a-f]{64}$/', $body['token']);
+        self::assertSame(['id', 'email', 'displayName'], array_keys($body['user']));
+        self::assertSame('carol@test.local', $body['user']['email']);
+
+        $apiToken = $this->em->getRepository(ApiToken::class)->findOneBy(['token' => $body['token']]);
+        self::assertNotNull($apiToken);
+        self::assertFalse($apiToken->isExpired());
+        // Valable 24 h : on tolère une minute d'écart d'exécution.
+        self::assertEqualsWithDelta(time() + 86400, $apiToken->getExpiresAt()->getTimestamp(), 60);
+    }
+
+    public function testLoginGivesSameAnswerForUnknownEmailAndWrongPassword(): void
+    {
+        $this->createUser('carol@test.local', 'motdepasse');
+
+        $this->login(['email' => 'carol@test.local', 'password' => 'mauvais']);
+        self::assertResponseStatusCodeSame(401);
+        $wrongPassword = $this->json();
+
+        $this->login(['email' => 'inconnu@test.local', 'password' => 'motdepasse']);
+        self::assertResponseStatusCodeSame(401);
+        $unknownEmail = $this->json();
+
+        // On ne compare que les champs du contrat : hors prod, le corps contient aussi la trace de l'exception.
+        $contractFields = static fn (array $body): array => [$body['title'], $body['status'], $body['detail']];
+        self::assertSame($contractFields($wrongPassword), $contractFields($unknownEmail));
+        self::assertSame(401, $unknownEmail['status']);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    #[DataProvider('invalidLoginPayloads')]
+    public function testLoginWithIncompletePayloadReturns422(array $payload): void
+    {
+        $this->login($payload);
+
+        self::assertResponseStatusCodeSame(422);
+    }
+
+    /**
+     * @return iterable<string, array{array<string, mixed>}>
+     */
+    public static function invalidLoginPayloads(): iterable
+    {
+        yield 'corps vide' => [[]];
+        yield 'mot de passe absent' => [['email' => 'carol@test.local']];
+        yield 'email vide' => [['email' => '', 'password' => 'motdepasse']];
+        yield 'mot de passe non chaîne' => [['email' => 'carol@test.local', 'password' => 12345678]];
+    }
+
+    public function testLoginWithMalformedJsonReturns400(): void
+    {
+        $this->client->request('POST', '/api/auth/login', server: ['CONTENT_TYPE' => 'application/json'], content: '{oups');
+
+        self::assertResponseStatusCodeSame(400);
+    }
+
+    private function createUser(string $email, string $plainPassword): void
+    {
+        $user = new User($email, 'Carol', '');
+        $user->changePassword(
+            static::getContainer()->get(UserPasswordHasherInterface::class)->hashPassword($user, $plainPassword),
+        );
+        $this->em->persist($user);
+        $this->em->flush();
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function login(array $payload): void
+    {
+        $this->client->jsonRequest('POST', '/api/auth/login', $payload);
     }
 
     /**
