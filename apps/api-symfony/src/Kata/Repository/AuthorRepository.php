@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Kata\Repository;
 
 use App\Kata\Entity\Author;
+use App\Kata\Entity\Book;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -30,7 +31,15 @@ class AuthorRepository extends ServiceEntityRepository
      */
     public function k14FindAuthorsWithARatingOf(int $rating): array
     {
-        throw new \LogicException('TODO K14');
+        return $this->createQueryBuilder('a')
+            ->join('a.books', 'b')
+            ->join('b.reviews', 'r')
+            ->where('r.rating = :rating')
+            ->setParameter('rating', $rating)
+            ->distinct()
+            ->orderBy('a.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -41,7 +50,18 @@ class AuthorRepository extends ServiceEntityRepository
      */
     public function k15FindAuthorsWithoutBooks(): array
     {
-        throw new \LogicException('TODO K15');
+        $qb = $this->createQueryBuilder('a');
+
+        $booksOfAuthor = $this->getEntityManager()->createQueryBuilder()
+            ->select('1')
+            ->from(Book::class, 'b')
+            ->where('b.author = a');
+
+        return $qb
+            ->where($qb->expr()->not($qb->expr()->exists($booksOfAuthor->getDQL())))
+            ->orderBy('a.name', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -50,6 +70,14 @@ class AuthorRepository extends ServiceEntityRepository
      */
     public function k16FindMostReviewedAuthor(): ?Author
     {
-        throw new \LogicException('TODO K16');
+        return $this->createQueryBuilder('a')
+            ->join('a.books', 'b')
+            ->join('b.reviews', 'r')
+            ->groupBy('a')
+            ->orderBy('COUNT(r.id)', 'DESC')
+            ->addOrderBy('a.name', 'ASC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

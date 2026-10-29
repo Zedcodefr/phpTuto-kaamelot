@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Kata\Repository;
 
 use App\Kata\Dto\BookSummary;
+use App\Kata\Entity\Author;
 use App\Kata\Entity\Book;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -32,7 +34,11 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k01FindAllOrderedByTitle(): array
     {
-        throw new \LogicException('TODO K01');
+        // QueryBuilder ≈ LINQ to Entities (le DQL interroge des entités, pas des tables)
+        return $this->createQueryBuilder('t')
+            ->orderBy('t.title', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -44,7 +50,13 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k02FindByAuthorName(string $name): array
     {
-        throw new \LogicException('TODO K02');
+        return $this->createQueryBuilder('t')
+            ->join('t.author','a')
+            ->addSelect('a')
+            ->where('a.name = :name' ) ->setParameter('name',$name)
+            ->orderBy('t.title', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -55,7 +67,13 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k03FindPublishedBetween(\DateTimeImmutable $from, \DateTimeImmutable $to): array
     {
-        throw new \LogicException('TODO K03');
+        return $this->createQueryBuilder('t')
+            ->where('t.publishedAt BETWEEN :from AND :to')
+            ->setParameter('from', $from, Types::DATE_IMMUTABLE)
+            ->setParameter('to', $to, Types::DATE_IMMUTABLE)
+            ->orderBy('t.publishedAt', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -67,7 +85,10 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k04FindWithAtLeastPages(int $minPages): array
     {
-        throw new \LogicException('TODO K04');
+       return $this->getEntityManager()
+            ->createQuery('SELECT t FROM App\Kata\Entity\Book t WHERE t.pages >= :minpages ORDER BY t.pages DESC')
+            ->setParameter('minpages', $minPages)
+            ->getResult();
     }
 
     /**
@@ -80,7 +101,21 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k05CountBooksPerAuthor(): array
     {
-        throw new \LogicException('TODO K05');
+        $rows = $this->getEntityManager()->createQueryBuilder()
+            ->select('a.name AS name', 'COUNT(b.id) AS total')
+            ->from(Author::class, 'a')
+            ->leftJoin('a.books', 'b')
+            ->groupBy('a.id')
+            ->orderBy('a.name', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[$row['name']] = (int) $row['total'];
+        }
+
+        return $counts;
     }
 
     /**
@@ -91,7 +126,12 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k06FindOneWithReviews(int $id): ?Book
     {
-        throw new \LogicException('TODO K06');
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.reviews','r')
+            ->addSelect('r')
+            ->where('t.id = :id' ) ->setParameter('id',$id)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
     /**
@@ -103,7 +143,21 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k07FindAverageRatingsAtLeast(float $minAverage): array
     {
-        throw new \LogicException('TODO K07');
+        $rows = $this->createQueryBuilder('t')
+            ->select('t.title AS title', 'AVG(r.rating) AS average')
+            ->join('t.reviews', 'r')
+            ->groupBy('t.id')
+            ->having('AVG(r.rating) >= :min')
+            ->setParameter('min', $minAverage)
+            ->orderBy('average', 'DESC')
+            ->addOrderBy('t.title', 'ASC')
+            ->getQuery()
+            ->getArrayResult();
+
+        return array_map(
+            static fn (array $row): array => ['title' => $row['title'], 'average' => round((float) $row['average'], 2)],
+            $rows,
+        );
     }
 
     /**
@@ -114,7 +168,13 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k08FindByTag(string $tagName): array
     {
-        throw new \LogicException('TODO K08');
+        return $this->createQueryBuilder('t')
+            ->join('t.tags', 'tag')
+            ->where('tag.name = :tagName')
+            ->setParameter('tagName', $tagName)
+            ->orderBy('t.title', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**
@@ -129,7 +189,24 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k09Search(?string $text = null, ?string $authorCountry = null, ?bool $outOfPrint = null): array
     {
-        throw new \LogicException('TODO K09');
+        $qb = $this->createQueryBuilder('t')
+            ->join('t.author', 'a')
+            ->orderBy('t.title', 'ASC');
+
+        if (null !== $text) {
+            $qb->andWhere('LOWER(t.title) LIKE :text')
+                ->setParameter('text', '%'.mb_strtolower($text).'%');
+        }
+        if (null !== $authorCountry) {
+            $qb->andWhere('a.country = :country')
+                ->setParameter('country', $authorCountry);
+        }
+        if (null !== $outOfPrint) {
+            $qb->andWhere('t.outOfPrint = :outOfPrint')
+                ->setParameter('outOfPrint', $outOfPrint);
+        }
+
+        return $qb->getQuery()->getResult();
     }
 
     /**
@@ -142,7 +219,18 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k10Paginate(int $page, int $limit): array
     {
-        throw new \LogicException('TODO K10');
+        $query = $this->createQueryBuilder('t')
+            ->orderBy('t.title', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery();
+
+        $paginator = new Paginator($query);
+
+        return [
+            'items' => iterator_to_array($paginator, false),
+            'total' => count($paginator),
+        ];
     }
 
     /**
@@ -154,7 +242,16 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k11FindSummaries(): array
     {
-        throw new \LogicException('TODO K11');
+        return $this->getEntityManager()
+            ->createQuery(
+                'SELECT NEW App\Kata\Dto\BookSummary(t.title, a.name, COUNT(r.id))
+                 FROM App\Kata\Entity\Book t
+                 JOIN t.author a
+                 LEFT JOIN t.reviews r
+                 GROUP BY t.id, a.name
+                 ORDER BY t.title ASC'
+            )
+            ->getResult();
     }
 
     /**
@@ -165,7 +262,10 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k12MarkOutOfPrintPublishedBefore(\DateTimeImmutable $date): int
     {
-        throw new \LogicException('TODO K12');
+        return $this->getEntityManager()
+            ->createQuery('UPDATE App\Kata\Entity\Book t SET t.outOfPrint = true WHERE t.publishedAt < :date AND t.outOfPrint = false')
+            ->setParameter('date', $date, Types::DATE_IMMUTABLE)
+            ->execute();
     }
 
     /**
@@ -176,6 +276,11 @@ class BookRepository extends ServiceEntityRepository
      */
     public function k13FindNeverReviewed(): array
     {
-        throw new \LogicException('TODO K13');
+        return $this->createQueryBuilder('t')
+            ->leftJoin('t.reviews', 'r')
+            ->where('r.id IS NULL')
+            ->orderBy('t.title', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }
