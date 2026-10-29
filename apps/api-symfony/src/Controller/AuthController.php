@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Dto\RegisterInput;
+use App\Dto\UserOutput;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -35,11 +36,7 @@ final class AuthController extends AbstractController
         $this->em->flush();
 
         // Pas de Location : il n'existe pas de GET /api/users/{id} (voir le contrat).
-        // On construit la réponse à la main pour ne jamais exposer le hash du mot de passe.
-        return $this->json([
-            'id' => $user->getId(),
-            'email' => $user->getEmail(),
-            'displayName' => $user->getDisplayName(),
-        ], Response::HTTP_CREATED);
+        // UserOutput limite la réponse à id/email/displayName : jamais le hash du mot de passe.
+        return $this->json(UserOutput::fromEntity($user), Response::HTTP_CREATED);
     }
 }
