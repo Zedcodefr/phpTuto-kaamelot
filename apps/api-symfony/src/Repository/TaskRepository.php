@@ -42,10 +42,10 @@ class TaskRepository extends ServiceEntityRepository
             ->setFirstResult(($filter->page - 1) * $filter->limit)
             ->setMaxResults($filter->limit);
 
-        if (null !== $filter->status) {
+        if ($filter->status !== null) {
             $qb->andWhere('t.status = :status')->setParameter('status', $filter->status);
         }
-        if (null !== $filter->search && '' !== $filter->search) {
+        if ($filter->search !== null && $filter->search !== '') {
             $qb->andWhere('LOWER(t.title) LIKE :q OR LOWER(t.description) LIKE :q')
                 ->setParameter('q', '%'.mb_strtolower($filter->search).'%');
         }
