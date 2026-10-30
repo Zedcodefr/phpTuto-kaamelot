@@ -15,6 +15,14 @@ security:
             # Ensure dev tools and static assets are always allowed
             pattern: ^/(_profiler(/|$)|(_wdt|assets|build)/)
             security: false
+        # L'API : sans session (stateless), le token est relu à chaque requête.
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: app_user_provider
+            access_token:
+                token_handler: App\Security\ApiTokenHandler
+                failure_handler: App\Security\ApiTokenFailureHandler
         main:
             lazy: true
             provider: app_user_provider
