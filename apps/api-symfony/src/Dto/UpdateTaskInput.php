@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Dto;
 
 use App\Enum\TaskStatus;
+use App\Validator\ExistingUser;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -25,6 +26,10 @@ final readonly class UpdateTaskInput
         public ?string $description = null,
 
         public ?TaskStatus $status = null,
+
+        // null = absent OU « désassigner » : le contrôleur distingue les deux en lisant les clés du JSON.
+        #[ExistingUser]
+        public ?int $assigneeId = null,
     ) {
     }
 }
