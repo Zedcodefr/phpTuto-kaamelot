@@ -37,12 +37,23 @@ class Task
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
 
-    public function __construct(string $title, ?string $description = null, TaskStatus $status = TaskStatus::Todo)
+    // Côté propriétaire (la clé étrangère est dans task). nullable : les tâches créées avant
+    // l'authentification n'ont pas d'auteur ; SET NULL : supprimer un User ne supprime pas ses tâches.
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $author = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $assignee = null;
+
+    public function __construct(string $title, ?string $description = null, TaskStatus $status = TaskStatus::Todo, ?User $author = null)
     {
         $this->title = $title;
         $this->description = $description;
         $this->status = $status;
         $this->createdAt = new \DateTimeImmutable();
+        $this->author = $author;
     }
 
     public function getId(): ?int
@@ -83,5 +94,20 @@ class Task
     public function getCreatedAt(): \DateTimeImmutable
     {
         return $this->createdAt;
+    }
+
+    public function getAuthor(): ?User
+    {
+        return $this->author;
+    }
+
+    public function getAssignee(): ?User
+    {
+        return $this->assignee;
+    }
+
+    public function assignTo(?User $assignee): void
+    {
+        $this->assignee = $assignee;
     }
 }
