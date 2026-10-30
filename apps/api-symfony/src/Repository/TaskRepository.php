@@ -30,6 +30,8 @@ class TaskRepository extends ServiceEntityRepository
     {
         // QueryBuilder ≈ LINQ to Entities (le DQL interroge des entités, pas des tables)
         return $this->createQueryBuilder('t')
+            ->leftJoin('t.author', 'author')->addSelect('author')
+            ->leftJoin('t.assignee', 'assignee')->addSelect('assignee')
             ->orderBy('t.id', 'ASC')
             ->getQuery()
             ->getResult();
@@ -37,7 +39,10 @@ class TaskRepository extends ServiceEntityRepository
 
     public function search(TaskFilter $filter): Paginator
     {
+        // fetch join : author et assignee sont chargés dans la même requête (sinon un SELECT par User = N+1)
         $qb = $this->createQueryBuilder('t')
+            ->leftJoin('t.author', 'author')->addSelect('author')
+            ->leftJoin('t.assignee', 'assignee')->addSelect('assignee')
             ->orderBy('t.id', 'ASC')
             ->setFirstResult(($filter->page - 1) * $filter->limit)
             ->setMaxResults($filter->limit);
